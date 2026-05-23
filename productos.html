@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Productos — Flamingo Sports</title>
+<meta name="description" content="Todos los calcetines Flamingo Sports. Tenis y pádel. 8 colores exclusivos.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#1B2D4A;--coral:#F0907C;--teal:#00B5BD;--cream:#F7F4F0;--white:#fff;--text:#1a1a1a;--muted:#666;--r:'Raleway',sans-serif;--i:'Inter',sans-serif;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--i);color:var(--text);background:var(--white);}
+img{display:block;width:100%;height:100%;object-fit:cover;}
+a{text-decoration:none;color:inherit;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 5vw;background:rgba(27,45,74,0.95);backdrop-filter:blur(10px);}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo img{height:28px;width:28px;object-fit:contain;filter:invert(1) brightness(2);}
+.nav-logo-text{font-family:var(--r);font-size:14px;font-weight:800;letter-spacing:5px;color:white;text-transform:uppercase;}
+.nav-links{display:flex;align-items:center;gap:28px;}
+.nav-link{font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);transition:color .2s;}
+.nav-link:hover{color:var(--coral);}
+.nav-cta{font-family:var(--r);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:var(--coral);color:white;padding:9px 20px;border-radius:2px;}
+
+.page-header{background:var(--navy);padding:120px 6vw 60px;text-align:center;}
+.page-eyebrow{font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--coral);margin-bottom:10px;}
+.page-title{font-family:var(--r);font-size:clamp(32px,5vw,60px);font-weight:900;color:white;letter-spacing:-1px;margin-bottom:12px;}
+.page-sub{font-family:var(--i);font-size:15px;color:rgba(255,255,255,.55);max-width:500px;margin:0 auto;line-height:1.7;}
+
+.products-section{padding:60px 6vw;background:var(--cream);}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:40px;justify-content:center;}
+.pf{font-family:var(--r);font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:8px 18px;border-radius:2px;border:1.5px solid #ccc;color:var(--muted);cursor:pointer;transition:all .2s;background:transparent;}
+.pf.active,.pf:hover{background:var(--navy);border-color:var(--navy);color:white;}
+
+.products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
+.product-card{background:white;border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.1);}
+.product-img{aspect-ratio:1/1;overflow:hidden;}
+.product-img img{transition:transform .5s;}
+.product-card:hover .product-img img{transform:scale(1.06);}
+.product-info{padding:14px 16px 18px;}
+.product-name{font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:4px;}
+.product-color{font-family:var(--i);font-size:12px;color:var(--muted);margin-bottom:8px;}
+.product-type{display:inline-block;font-family:var(--r);font-size:8.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;background:var(--cream);color:var(--navy);padding:4px 8px;border-radius:2px;}
+
+.placeholder-msg{
+  grid-column:1/-1;text-align:center;padding:60px 20px;
+  font-family:var(--i);color:var(--muted);font-size:14px;line-height:1.7;
+  background:white;border-radius:4px;border:2px dashed #ddd;
+}
+.placeholder-msg strong{display:block;font-family:var(--r);font-size:16px;font-weight:800;color:var(--navy);margin-bottom:8px;}
+
+footer-simple{display:block;background:#0e1e32;padding:24px 6vw;text-align:center;}
+.footer-copy{font-family:var(--i);font-size:11px;color:rgba(255,255,255,.2);}
+.back-link{display:inline-flex;align-items:center;gap:6px;font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--coral);margin-top:28px;}
+
+@media(max-width:768px){.products-grid{grid-template-columns:repeat(2,1fr);}nav .nav-link{display:none;}}
+</style>
+</head>
+<body>
+
+<script>
+/* =====================================================
+   PRODUCTOS — EDITAR AQUÍ
+   Para agregar, quitar o cambiar un producto:
+   1. Edita el array PRODUCTOS de abajo
+   2. Guarda el archivo
+   3. Recarga la página en el navegador
+
+   Campos por producto:
+   - nombre: texto que aparece en negrita (ej: "Performance")
+   - color: descripción del color (ej: "Turquesa / Mint")
+   - tipo: etiqueta pequeña abajo (ej: "Calcetín corto" o "Calcetín medio")
+   - imagen: nombre del archivo en la carpeta images/ (ej: "prod-turquesa.jpg")
+   - alt: texto alternativo para la imagen
+===================================================== */
+const PRODUCTOS = [
+  // ── Calcetín corto ──
+  { nombre: "Parina",     color: "Negro",           tipo: "Calcetín corto",  imagen: "prod-parina-negro.jpg",       alt: "Parina Negro" },
+  { nombre: "Parina",     color: "Verde Flúor",     tipo: "Calcetín corto",  imagen: "prod-parina-verde.jpg",       alt: "Parina Verde Flúor" },
+
+  // ── Calcetín medio ──
+  { nombre: "Mamalluca",  color: "Lila",            tipo: "Calcetín medio",  imagen: "prod-mamalluca-lila.jpg",     alt: "Mamalluca Lila" },
+  { nombre: "Mamalluca",  color: "Morado",          tipo: "Calcetín medio",  imagen: "prod-mamalluca-morado.jpg",   alt: "Mamalluca Morado" },
+  { nombre: "Mamalluca",  color: "Celeste",         tipo: "Calcetín medio",  imagen: "prod-mamalluca-celeste.jpg",  alt: "Mamalluca Celeste" },
+
+  // ── Calcetín largo ──
+  { nombre: "Tamarugal",  color: "Navy",            tipo: "Calcetín largo",  imagen: "prod-tamarugal-navy.jpg",     alt: "Tamarugal Navy" },
+  { nombre: "Tamarugal",  color: "Blanco",          tipo: "Calcetín largo",  imagen: "prod-tamarugal-blanco.jpg",   alt: "Tamarugal Blanco" },
+  { nombre: "Tatio",      color: "Turquesa",        tipo: "Calcetín largo",  imagen: "prod-tatio-turquesa.jpg",     alt: "Tatio Turquesa" },
+  { nombre: "Artemis",    color: "Gris",            tipo: "Calcetín largo",  imagen: "prod-artemis-gris.jpg",       alt: "Artemis Gris" },
+  { nombre: "Artemis",    color: "Blanco y Celeste",tipo: "Calcetín largo",  imagen: "prod-artemis-celeste.jpg",    alt: "Artemis Blanco y Celeste" },
+  { nombre: "Artemis",    color: "Pink",            tipo: "Calcetín largo",  imagen: "prod-artemis-pink.jpg",       alt: "Artemis Pink" },
+];
+
+/* Texto del encabezado de la página — edita aquí también */
+const PAGINA = {
+  eyebrow: "Catálogo completo",
+  titulo:  "Todos los productos",
+  subtitulo: "Calcetines técnicos de alto rendimiento para tenis y pádel.<br>11 colores. Tres alturas de caña.",
+};
+</script>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo-negro.png" alt="Flamingo">
+    <span class="nav-logo-text">Flamingo</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#coleccion" class="nav-link">Inicio</a>
+    <a href="index.html#performance" class="nav-link">Performance</a>
+    <a href="nosotros.html" class="nav-link">Nosotros</a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="nav-cta">Instagram</a>
+  </div>
+</nav>
+
+<div class="page-header">
+  <div class="page-eyebrow" id="hdr-eyebrow"></div>
+  <h1 class="page-title" id="hdr-titulo"></h1>
+  <p class="page-sub" id="hdr-sub"></p>
+</div>
+
+<section class="products-section">
+  <div class="filter-bar">
+    <button class="pf active" onclick="filtrar(this,'todos')">Todos</button>
+    <button class="pf" onclick="filtrar(this,'corto')">Calcetín corto</button>
+    <button class="pf" onclick="filtrar(this,'medio')">Calcetín medio</button>
+    <button class="pf" onclick="filtrar(this,'largo')">Calcetín largo</button>
+  </div>
+  <div class="products-grid" id="grid"></div>
+  <div style="text-align:center;margin-top:36px;">
+    <a href="index.html" class="back-link">← Volver al inicio</a>
+  </div>
+</section>
+
+<footer-simple>
+  <p class="footer-copy">© 2026 Flamingo Sports · Santiago, Chile</p>
+</footer-simple>
+
+<script>
+document.getElementById('hdr-eyebrow').textContent = PAGINA.eyebrow;
+document.getElementById('hdr-titulo').textContent  = PAGINA.titulo;
+document.getElementById('hdr-sub').innerHTML       = PAGINA.subtitulo;
+
+function renderGrid(filtro) {
+  const grid = document.getElementById('grid');
+  const items = filtro === 'todos'
+    ? PRODUCTOS
+    : PRODUCTOS.filter(p => p.tipo.toLowerCase().includes(filtro));
+
+  grid.innerHTML = items.map(p => `
+    <div class="product-card">
+      <div class="product-img"><img src="images/${p.imagen}" alt="${p.alt}" loading="lazy"></div>
+      <div class="product-info">
+        <div class="product-name">${p.nombre}</div>
+        <div class="product-color">${p.color}</div>
+        <span class="product-type">${p.tipo}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+function filtrar(btn, tipo) {
+  document.querySelectorAll('.pf').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(tipo);
+}
+
+renderGrid('todos');
+</script>
+</body>
+</html>

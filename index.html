@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Flamingo Sports — Calcetines de alto rendimiento para tenis y pádel</title>
+<meta name="description" content="Calcetines técnicos para tenis y pádel. Técnico por dentro. Colorido por fuera. Chile.">
+<meta property="og:title" content="Flamingo Sports">
+<meta property="og:description" content="Calcetines técnicos para tenis y pádel. Técnico por dentro. Colorido por fuera.">
+<meta property="og:image" content="images/hero.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#1B2D4A; --navy2:#0e1e32;
+  --coral:#F0907C; --teal:#00B5BD;
+  --pink:#E8498B; --lime:#C8FF00;
+  --cream:#F7F4F0; --white:#fff;
+  --text:#1a1a1a; --muted:#666;
+  --r:'Raleway',sans-serif; --i:'Inter',sans-serif;
+}
+html{scroll-behavior:smooth;}
+body{font-family:var(--i);color:var(--text);background:var(--white);overflow-x:hidden;}
+img{display:block;width:100%;height:100%;object-fit:cover;}
+a{text-decoration:none;color:inherit;}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:200;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 5vw;
+  background:rgba(27,45,74,0.95);
+  backdrop-filter:blur(10px);
+  border-bottom:1px solid rgba(255,255,255,0.06);
+}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo img{height:30px;width:30px;object-fit:contain;filter:invert(1) brightness(2);}
+.nav-logo-text{
+  font-family:var(--r);font-size:15px;font-weight:800;
+  letter-spacing:5px;color:white;text-transform:uppercase;
+}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-link{
+  font-family:var(--r);font-size:10px;font-weight:700;
+  letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,0.6);transition:color .2s;
+}
+.nav-link:hover{color:var(--coral);}
+.nav-cta{
+  font-family:var(--r);font-size:10px;font-weight:800;
+  letter-spacing:2px;text-transform:uppercase;
+  background:var(--coral);color:white;
+  padding:9px 22px;border-radius:2px;transition:background .2s;
+}
+.nav-cta:hover{background:#d97563;}
+
+/* ── HERO ── */
+#hero{position:relative;height:100svh;min-height:600px;display:flex;align-items:flex-end;overflow:hidden;}
+.hero-bg{position:absolute;inset:0;background:url('images/hero.jpg') center/cover no-repeat;}
+.hero-bg::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(27,45,74,.92) 0%,rgba(27,45,74,.40) 55%,rgba(0,0,0,.1) 100%);
+}
+.hero-content{position:relative;z-index:2;padding:0 6vw 9vh;max-width:680px;}
+.hero-eyebrow{
+  font-family:var(--r);font-size:10px;font-weight:700;
+  letter-spacing:4px;text-transform:uppercase;color:var(--coral);margin-bottom:14px;
+}
+.hero-title{
+  font-family:var(--r);font-size:clamp(40px,7.5vw,86px);
+  font-weight:900;line-height:.95;color:white;margin-bottom:20px;letter-spacing:-2px;
+}
+.hero-title em{color:var(--coral);font-style:normal;}
+.hero-sub{
+  font-family:var(--i);font-size:clamp(14px,1.6vw,16px);font-weight:300;
+  color:rgba(255,255,255,.65);line-height:1.7;margin-bottom:36px;max-width:460px;
+}
+.hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+.btn{
+  font-family:var(--r);font-size:11px;font-weight:800;
+  letter-spacing:2.5px;text-transform:uppercase;
+  padding:14px 30px;border-radius:2px;transition:all .2s;display:inline-block;
+}
+.btn-coral{background:var(--coral);color:white;}
+.btn-coral:hover{background:#d97563;transform:translateY(-1px);}
+.btn-outline{border:1.5px solid rgba(255,255,255,.4);color:white;}
+.btn-outline:hover{border-color:white;}
+.hero-buy{display:flex;align-items:center;gap:16px;margin-top:18px;padding-top:18px;border-top:1px solid rgba(255,255,255,.12);}
+.hero-buy-label{font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.45);white-space:nowrap;}
+.btn-ml{font-family:var(--r);font-size:10.5px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:#FFE600;color:#1a1a1a;padding:11px 24px;border-radius:2px;transition:all .2s;display:inline-block;}
+.btn-ml:hover{background:#f0d800;transform:translateY(-1px);}
+.color-strip{
+  position:absolute;bottom:0;left:0;right:0;height:3px;z-index:3;
+  background:linear-gradient(90deg,var(--coral),var(--pink),var(--teal),var(--lime),#7B4FE0,var(--coral));
+}
+
+/* ── BENEFITS STRIP ── */
+#benefits{background:var(--navy);padding:20px 6vw;}
+.benefits-row{display:flex;justify-content:center;gap:0;}
+.benefit{
+  flex:1;max-width:220px;
+  display:flex;align-items:center;gap:10px;
+  padding:0 24px;border-right:1px solid rgba(255,255,255,.1);
+}
+.benefit:last-child{border-right:none;}
+.benefit-icon{font-size:20px;flex-shrink:0;}
+.benefit-text{font-family:var(--r);font-size:9.5px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.65);}
+
+/* ── SECTION SHARED ── */
+.section-pad{padding:80px 6vw;}
+.eyebrow{
+  font-family:var(--r);font-size:10px;font-weight:700;
+  letter-spacing:4px;text-transform:uppercase;color:var(--coral);margin-bottom:10px;
+}
+.section-h{
+  font-family:var(--r);font-size:clamp(26px,4vw,44px);
+  font-weight:900;line-height:1.05;letter-spacing:-0.5px;color:var(--navy);margin-bottom:14px;
+}
+.section-h.w{color:white;}
+.section-p{
+  font-family:var(--i);font-size:15px;color:var(--muted);
+  line-height:1.75;max-width:540px;margin-bottom:44px;
+}
+.section-p.w{color:rgba(255,255,255,.6);}
+
+/* ── PRODUCTOS ── */
+#coleccion{background:var(--cream);}
+.product-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:36px;}
+.pf{
+  font-family:var(--r);font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  padding:7px 16px;border-radius:2px;border:1.5px solid #ccc;color:var(--muted);
+  cursor:pointer;transition:all .2s;background:transparent;
+}
+.pf.active,.pf:hover{background:var(--navy);border-color:var(--navy);color:white;}
+.products-grid{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
+}
+.product-card{background:white;border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;}
+.product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12);}
+.product-img{aspect-ratio:1/1;overflow:hidden;}
+.product-img img{transition:transform .5s;}
+.product-card:hover .product-img img{transform:scale(1.06);}
+.product-info{padding:14px 16px 18px;}
+.product-name{font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:4px;}
+.product-color{font-family:var(--i);font-size:12px;color:var(--muted);}
+.product-dots{display:flex;gap:5px;margin-top:10px;}
+.dot{width:12px;height:12px;border-radius:50%;border:1.5px solid rgba(0,0,0,.08);}
+.products-cta{text-align:center;margin-top:40px;}
+
+/* ── CAROUSEL ── */
+#carousel-section{background:var(--navy2);padding:0;overflow:hidden;position:relative;}
+.carousel-wrapper{position:relative;}
+.carousel-track{
+  display:flex;transition:transform .55s cubic-bezier(.4,0,.2,1);
+  will-change:transform;
+}
+.carousel-slide{flex-shrink:0;width:100%;height:70vh;min-height:420px;position:relative;}
+.carousel-slide img{width:100%;height:100%;object-fit:cover;}
+.carousel-slide::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(27,45,74,.6) 0%,transparent 60%);
+}
+.carousel-btn{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:10;
+  width:48px;height:48px;border-radius:50%;
+  background:rgba(255,255,255,.15);border:1.5px solid rgba(255,255,255,.3);
+  color:white;font-size:18px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .2s;backdrop-filter:blur(4px);
+}
+.carousel-btn:hover{background:rgba(255,255,255,.3);}
+.carousel-prev{left:20px;}
+.carousel-next{right:20px;}
+.carousel-dots{
+  position:absolute;bottom:20px;left:50%;transform:translateX(-50%);
+  display:flex;gap:8px;z-index:10;
+}
+.cdot{
+  width:6px;height:6px;border-radius:50%;
+  background:rgba(255,255,255,.4);cursor:pointer;transition:all .2s;
+}
+.cdot.active{background:var(--coral);width:22px;border-radius:3px;}
+
+/* ── PERFORMANCE ── */
+#performance{background:var(--navy);}
+.perf-layout{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
+.perf-photo{border-radius:4px;overflow:hidden;aspect-ratio:4/5;}
+.feat-list{display:flex;flex-direction:column;gap:30px;}
+.feat{display:flex;gap:18px;align-items:flex-start;}
+.feat-n{
+  font-family:var(--r);font-size:34px;font-weight:900;
+  color:var(--coral);line-height:1;flex-shrink:0;width:42px;
+}
+.feat-title{font-family:var(--r);font-size:13px;font-weight:800;color:white;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;}
+.feat-desc{font-family:var(--i);font-size:13.5px;color:rgba(255,255,255,.5);line-height:1.65;}
+
+/* ── EVENTOS ── */
+#eventos{background:var(--cream);}
+.eventos-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;}
+.evento-card{position:relative;overflow:hidden;border-radius:4px;aspect-ratio:4/3;cursor:pointer;}
+.evento-card img{transition:transform .5s;}
+.evento-card:hover img{transform:scale(1.05);}
+.evento-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(27,45,74,.75) 0%,transparent 55%);
+}
+.evento-label{
+  position:absolute;bottom:14px;left:14px;z-index:2;
+  font-family:var(--r);font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:white;
+}
+.evento-label span{display:block;font-size:12px;font-weight:800;margin-top:2px;color:var(--coral);}
+
+/* ── NOSOTROS ── */
+#nosotros{background:white;}
+.nosotros-layout{display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center;}
+.founders-row{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:36px;}
+.founder-card{text-align:center;}
+.founder-photo{
+  aspect-ratio:3/4;border-radius:4px;overflow:hidden;margin-bottom:12px;
+  border-bottom:3px solid var(--coral);
+}
+.founder-name{font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);}
+.founder-role{font-family:var(--i);font-size:12px;color:var(--muted);margin-top:2px;}
+.nosotros-text p{
+  font-family:var(--i);font-size:15px;color:var(--muted);line-height:1.75;margin-bottom:18px;
+}
+.tags-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:28px;}
+.tag{
+  font-family:var(--r);font-size:9.5px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  border:1.5px solid var(--navy);color:var(--navy);padding:7px 14px;border-radius:2px;
+}
+
+/* ── INSTAGRAM FEED ── */
+#ig-feed{background:var(--navy);}
+.ig-feed-header{text-align:center;margin-bottom:40px;}
+.ig-handle-big{
+  font-family:var(--r);font-size:clamp(28px,5vw,52px);font-weight:900;
+  color:white;letter-spacing:-1px;margin:12px 0 8px;
+}
+.ig-handle-big span{color:var(--coral);}
+.ig-sub{font-family:var(--i);font-size:14px;font-weight:300;color:rgba(255,255,255,.5);margin-bottom:36px;}
+.ig-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px;margin-bottom:36px;}
+.ig-post{
+  position:relative;overflow:hidden;aspect-ratio:1/1;cursor:pointer;
+}
+.ig-post img{transition:transform .4s;}
+.ig-post:hover img{transform:scale(1.07);}
+.ig-post-overlay{
+  position:absolute;inset:0;
+  background:rgba(27,45,74,.75);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  opacity:0;transition:opacity .3s;
+}
+.ig-post:hover .ig-post-overlay{opacity:1;}
+.ig-post-overlay svg{width:28px;height:28px;margin-bottom:6px;}
+.ig-post-overlay span{font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:white;}
+.ig-feed-cta{text-align:center;}
+.btn-ig{
+  display:inline-flex;align-items:center;gap:10px;
+  font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;
+  background:white;color:var(--navy);padding:15px 36px;border-radius:2px;
+  transition:all .2s;
+}
+.btn-ig:hover{background:var(--cream);transform:translateY(-1px);}
+.ig-logo-icon{width:20px;height:20px;flex-shrink:0;}
+
+/* ── FOOTER ── */
+footer{background:var(--navy2);padding:48px 6vw 28px;}
+.footer-top{
+  display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;
+  gap:40px;padding-bottom:36px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+  margin-bottom:24px;
+}
+.footer-brand img{height:28px;width:28px;object-fit:contain;filter:invert(1) brightness(2);margin-bottom:8px;}
+.footer-brand-name{font-family:var(--r);font-size:14px;font-weight:800;letter-spacing:4px;color:white;text-transform:uppercase;margin-bottom:10px;}
+.footer-tagline{font-family:var(--i);font-size:12px;color:rgba(255,255,255,.35);line-height:1.6;}
+.footer-col-title{font-family:var(--r);font-size:9.5px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:16px;}
+.footer-links{display:flex;flex-direction:column;gap:10px;}
+.footer-link{font-family:var(--i);font-size:13px;color:rgba(255,255,255,.55);transition:color .2s;}
+.footer-link:hover{color:var(--coral);}
+.footer-contact-item{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.footer-contact-item svg{width:14px;height:14px;flex-shrink:0;color:var(--coral);}
+.footer-contact-item a{font-family:var(--i);font-size:13px;color:rgba(255,255,255,.55);transition:color .2s;}
+.footer-contact-item a:hover{color:var(--coral);}
+.footer-bottom{display:flex;align-items:center;justify-content:space-between;}
+.footer-copy{font-family:var(--i);font-size:11px;color:rgba(255,255,255,.2);}
+.footer-social{display:flex;gap:14px;}
+.footer-social a{color:rgba(255,255,255,.35);transition:color .2s;}
+.footer-social a:hover{color:var(--coral);}
+.footer-social svg{width:18px;height:18px;}
+
+/* ── MOBILE ── */
+@media(max-width:900px){
+  .nav-links .nav-link{display:none;}
+  .products-grid{grid-template-columns:repeat(2,1fr);}
+  .perf-layout{grid-template-columns:1fr;gap:40px;}
+  .perf-photo{aspect-ratio:16/9;}
+  .eventos-grid{grid-template-columns:repeat(2,1fr);}
+  .nosotros-layout{grid-template-columns:1fr;gap:40px;}
+  .founders-row{gap:12px;}
+  .ig-grid{grid-template-columns:repeat(3,1fr);}
+  .footer-top{grid-template-columns:1fr 1fr;gap:28px;}
+}
+@media(max-width:600px){
+  .benefits-row{flex-wrap:wrap;justify-content:flex-start;}
+  .benefit{flex:auto;max-width:50%;border-right:none;padding:8px 16px;}
+  .products-grid{grid-template-columns:repeat(2,1fr);gap:10px;}
+  .eventos-grid{grid-template-columns:1fr 1fr;gap:8px;}
+  .founders-row{grid-template-columns:repeat(3,1fr);gap:8px;}
+  .footer-top{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo-negro.png" alt="Flamingo">
+    <span class="nav-logo-text">Flamingo</span>
+  </a>
+  <div class="nav-links">
+    <a href="#coleccion" class="nav-link">Colección</a>
+    <a href="#performance" class="nav-link">Performance</a>
+    <a href="#eventos" class="nav-link">Eventos</a>
+    <a href="nosotros.html" class="nav-link">Nosotros</a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="nav-cta">Instagram</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <div class="hero-bg"></div>
+  <div class="color-strip"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">Flamingo Sports · Chile · Tenis y Pádel</div>
+    <h1 class="hero-title">Técnico<br>por dentro.<br><em>Colorido</em><br>por fuera.</h1>
+    <p class="hero-sub">Calcetines de alto rendimiento construidos para el jugador que cuida su juego — y su imagen.</p>
+    <div class="hero-actions">
+      <a href="#coleccion" class="btn btn-coral">Ver colección</a>
+      <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="btn btn-outline">@flamingosport.cl</a>
+    </div>
+    <div class="hero-buy">
+      <span class="hero-buy-label">¿Cómo comprar?</span>
+      <a href="https://www.mercadolibre.cl/par-calcetines-deportivos-flamingo-sport-varios-colores/up/MLCU3895368728?product_trigger_id=MLCU3895379816&pdp_filters=seller_id%3A56062975&applied_product_filters=MLCU3895367228&picker=true&quantity=1" target="_blank" class="btn-ml">Comprar en MercadoLibre</a>
+    </div>
+  </div>
+</section>
+
+
+<!-- COLECCIÓN — FOTOS LIMPIAS DE PRODUCTO -->
+<section id="coleccion" class="section-pad" style="background:var(--cream);">
+  <div class="eyebrow">La colección</div>
+  <h2 class="section-h">Encuentra los tuyos.</h2>
+  <p class="section-p">Tres modelos. Ocho colores. Un solo estándar técnico — zonas de amortiguación, compresión en el arco y ventilación activa.</p>
+
+  <div class="products-grid" style="margin-top:40px;">
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-calipso.png" alt="Tatio Calipso" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Tatio</div>
+        <div class="product-color">Calipso</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-pink.jpg" alt="Artemia Pink" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Artemia</div>
+        <div class="product-color">Pink</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-lila.jpg" alt="Mamalluca Lila" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Mamalluca</div>
+        <div class="product-color">Lila</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-morado.png" alt="Mamalluca Morado" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Mamalluca</div>
+        <div class="product-color">Morado</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-gris.jpg" alt="Artemia Gris" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Artemia</div>
+        <div class="product-color">Gris</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-whiteblue.png" alt="Artemia White Blue" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Artemia</div>
+        <div class="product-color">White Blue</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-navy2.png" alt="Tamarugal Navy" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Tamarugal</div>
+        <div class="product-color">Navy</div>
+      </div>
+    </div>
+    <div class="product-card">
+      <div class="product-img" style="background:#e8f4f8;"><img src="images/col-blanco2.png" alt="Tamarugal Blanco" loading="lazy" style="object-fit:contain;padding:12px;"></div>
+      <div class="product-info">
+        <div class="product-name">Tamarugal</div>
+        <div class="product-color">Blanco</div>
+      </div>
+    </div>
+  </div>
+  <div class="products-cta">
+    <a href="productos.html" class="btn btn-coral">Ver todos los productos</a>
+  </div>
+</section>
+
+<!-- EN CANCHA — CARRUSEL LIFESTYLE -->
+<section id="carousel-section">
+  <div style="text-align:center;padding:48px 6vw 0;">
+    <div class="eyebrow" style="color:var(--coral);">En cancha</div>
+    <h2 class="section-h" style="color:white;margin-bottom:0;">Para los que van a dejar huella.</h2>
+  </div>
+  <div class="carousel-wrapper" style="margin-top:32px;">
+    <div class="carousel-track" id="track">
+      <div class="carousel-slide"><img src="images/car4.jpg" alt="Flamingo Sports en cancha" loading="lazy"></div>
+      <div class="carousel-slide"><img src="images/car-dfm1767.jpg" alt="Flamingo Sports calcetín lime en cancha" loading="lazy"></div>
+      <div class="carousel-slide"><img src="images/gallery5.jpg" alt="Flamingo Sports colección" loading="lazy"></div>
+      <div class="carousel-slide"><img src="images/gallery4.jpg" alt="Flamingo Sports en cancha" loading="lazy" style="object-position:center 85%;"></div>
+      <div class="carousel-slide"><img src="images/car-dfm1783.jpg" alt="Flamingo Sports en cancha" loading="lazy"></div>
+      <div class="carousel-slide"><img src="images/car8.jpg" alt="Flamingo Sports colección" loading="lazy"></div>
+    </div>
+    <button class="carousel-btn carousel-prev" onclick="moveCarousel(-1)">&#8592;</button>
+    <button class="carousel-btn carousel-next" onclick="moveCarousel(1)">&#8594;</button>
+    <div class="carousel-dots" id="cdots"></div>
+  </div>
+</section>
+
+<!-- PERFORMANCE -->
+<section id="performance" class="section-pad">
+  <div class="perf-layout">
+    <div class="perf-photo"><img src="images/performance.jpg" alt="Flamingo Sports performance" loading="lazy"></div>
+    <div>
+      <div class="eyebrow">Por qué importa</div>
+      <h2 class="section-h w">Construido para rendir.</h2>
+      <p class="section-p w">Cada zona del calcetín tiene un propósito. El color es lo que ves — la ingeniería es lo que sientes a las 2 horas de partido.</p>
+      <div class="feat-list">
+        <div class="feat"><div class="feat-n">01</div><div><div class="feat-title">Amortiguación en antepié y talón</div><div class="feat-desc">Zonas de acolchado estratégico donde el impacto es mayor. Reduce fatiga en sets largos.</div></div></div>
+        <div class="feat"><div class="feat-n">02</div><div><div class="feat-title">Compresión en el arco</div><div class="feat-desc">Sostén firme del puente del pie. Estabilidad sin restricción de movimiento.</div></div></div>
+        <div class="feat"><div class="feat-n">03</div><div><div class="feat-title">Ventilación activa</div><div class="feat-desc">Panel de malla en el empeine. Temperatura regulada durante toda la sesión.</div></div></div>
+        <div class="feat"><div class="feat-n">04</div><div><div class="feat-title">Anti-deslizamiento interno</div><div class="feat-desc">No se mueve. No rota. No crea puntos de roce. Fijo desde el primer punto.</div></div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- EVENTOS -->
+<section id="eventos" class="section-pad">
+  <div class="eyebrow">Comunidad</div>
+  <h2 class="section-h">En cancha, siempre.</h2>
+  <p class="section-p">Torneos, clínicas y encuentros. Flamingo Sports está donde están los jugadores.</p>
+  <div class="eventos-grid">
+    <div class="evento-card">
+      <img src="images/evento6.jpg" alt="Torneo Flamingo Sports" loading="lazy">
+      <div class="evento-label">Pádel<span>Torneo Flamingo 2024</span></div>
+    </div>
+    <div class="evento-card">
+      <img src="images/fundador1.jpg" alt="Flamingo Sports comunidad" loading="lazy">
+      <div class="evento-label">Comunidad<span>Los Tíos Flamingo</span></div>
+    </div>
+    <div class="evento-card">
+      <img src="images/evento1.jpg" alt="Torneo Flamingo Sports" loading="lazy">
+      <div class="evento-label">Tenis · Pádel<span>Participantes 2024</span></div>
+    </div>
+    <div class="evento-card">
+      <img src="images/evento3.jpg" alt="Acción en cancha" loading="lazy">
+      <div class="evento-label">Pádel<span>En acción</span></div>
+    </div>
+    <div class="evento-card">
+      <img src="images/evento2.jpg" alt="Torneo Flamingo" loading="lazy">
+      <div class="evento-label">Comunidad<span>Torneo Flamingo</span></div>
+    </div>
+    <div class="evento-card">
+      <img src="images/evento4.jpg" alt="Flamingo Sports evento" loading="lazy">
+      <div class="evento-label">Comunidad<span>Flamingo Copa 2024</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- NOSOTROS -->
+<section id="nosotros" class="section-pad">
+  <div class="nosotros-layout">
+    <div class="nosotros-text">
+      <div class="eyebrow">Los Tíos Flamingo</div>
+      <h2 class="section-h">Hecho por jugadores, para jugadores.</h2>
+      <p>Flamingo Sports nació en una cancha de Santiago. Éramos tres jugadores que buscaban calcetines que funcionaran bien y que, por una vez, se vieran como la marca que éramos: vivos, con carácter, sin rendirse ante lo gris.</p>
+      <p>No encontramos lo que buscábamos — así que lo creamos. Ropa deportiva técnica con identidad visual propia. Chilena. Colorida. Para el jugador que no transa en ninguno de los dos.</p>
+      <div class="tags-row">
+        <span class="tag">Alto rendimiento</span>
+        <span class="tag">Hecho en Chile</span>
+        <span class="tag">Tenis · Pádel</span>
+        <span class="tag">Desde 2023</span>
+      </div>
+      <div style="margin-top:28px;">
+        <a href="nosotros.html" class="btn btn-coral">Conoce nuestra historia</a>
+      </div>
+    </div>
+    <div>
+      <div style="border-radius:4px;overflow:hidden;aspect-ratio:4/3;">
+        <img src="images/fundadores.jpg" alt="Los Tíos Flamingo — fundadores de Flamingo Sports" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <p style="font-family:var(--i);font-size:12px;color:var(--muted);margin-top:10px;text-align:center;letter-spacing:0.5px;">Nicolás, Kim y Diego — los Tíos Flamingo</p>
+    </div>
+  </div>
+</section>
+
+<!-- INSTAGRAM FEED -->
+<section id="ig-feed" class="section-pad">
+  <div class="ig-feed-header">
+    <div class="eyebrow">Síguenos</div>
+    <div class="ig-handle-big"><span>@</span>flamingosport.cl</div>
+    <p class="ig-sub">Canchas de arcilla, colores que no pasan desapercibidos.<br>Toda la marca vive en Instagram.</p>
+  </div>
+  <div class="ig-grid">
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="ig-post">
+      <img src="images/ig1.jpg" alt="Instagram Flamingo Sports" loading="lazy">
+      <div class="ig-post-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        <span>Ver en Instagram</span>
+      </div>
+    </a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="ig-post">
+      <img src="images/ig2.jpg" alt="Instagram Flamingo Sports" loading="lazy">
+      <div class="ig-post-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        <span>Ver en Instagram</span>
+      </div>
+    </a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="ig-post">
+      <img src="images/ig3.jpg" alt="Instagram Flamingo Sports" loading="lazy">
+      <div class="ig-post-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        <span>Ver en Instagram</span>
+      </div>
+    </a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="ig-post">
+      <img src="images/ig4.jpg" alt="Instagram Flamingo Sports" loading="lazy">
+      <div class="ig-post-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        <span>Ver en Instagram</span>
+      </div>
+    </a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="ig-post">
+      <img src="images/ig5.jpg" alt="Instagram Flamingo Sports" loading="lazy">
+      <div class="ig-post-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        <span>Ver en Instagram</span>
+      </div>
+    </a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="ig-post">
+      <img src="images/ig6.jpg" alt="Instagram Flamingo Sports" loading="lazy">
+      <div class="ig-post-overlay">
+        <svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="white" stroke="none"/></svg>
+        <span>Ver en Instagram</span>
+      </div>
+    </a>
+  </div>
+  <div class="ig-feed-cta">
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="btn-ig">
+      <svg class="ig-logo-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+        <circle cx="12" cy="12" r="4"/>
+        <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+      </svg>
+      Seguir en Instagram
+    </a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-top">
+    <div class="footer-brand">
+      <img src="images/logo-negro.png" alt="Flamingo">
+      <div class="footer-brand-name">Flamingo</div>
+      <p class="footer-tagline">Técnico por dentro.<br>Colorido por fuera.<br>Hecho en Chile.</p>
+    </div>
+    <div>
+      <div class="footer-col-title">Explora</div>
+      <div class="footer-links">
+        <a href="#coleccion" class="footer-link">Colección</a>
+        <a href="productos.html" class="footer-link">Todos los productos</a>
+        <a href="#performance" class="footer-link">Performance</a>
+        <a href="#eventos" class="footer-link">Eventos</a>
+        <a href="nosotros.html" class="footer-link">Nosotros</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Empresa</div>
+      <div class="footer-links">
+        <a href="nosotros.html" class="footer-link">¿Quiénes somos?</a>
+        <a href="#eventos" class="footer-link">Torneos</a>
+        <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="footer-link">Instagram</a>
+      </div>
+    </div>
+    <div>
+      <div class="footer-col-title">Contacto</div>
+      <div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <a href="mailto:flamingosport.cl@gmail.com" class="footer-link">flamingosport.cl@gmail.com</a>
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <a href="https://wa.me/56933864133" target="_blank" class="footer-link">WhatsApp</a>
+        </div>
+        <div class="footer-contact-item">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+          <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="footer-link">@flamingosport.cl</a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">© 2026 Flamingo Sports · Santiago, Chile</span>
+    <div class="footer-social">
+      <a href="https://www.instagram.com/flamingosport.cl" target="_blank" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ── CAROUSEL ──
+const track = document.getElementById('track');
+const slides = track.children;
+const total  = slides.length;
+let cur = 0, timer;
+
+const dotsEl = document.getElementById('cdots');
+for(let i=0;i<total;i++){
+  const d=document.createElement('div');
+  d.className='cdot'+(i===0?' active':'');
+  d.onclick=()=>goTo(i);
+  dotsEl.appendChild(d);
+}
+
+function goTo(n){
+  cur=(n+total)%total;
+  track.style.transform=`translateX(-${cur*100}%)`;
+  document.querySelectorAll('.cdot').forEach((d,i)=>d.classList.toggle('active',i===cur));
+}
+function moveCarousel(dir){clearInterval(timer);goTo(cur+dir);autoplay();}
+function autoplay(){timer=setInterval(()=>goTo(cur+1),4500);}
+autoplay();
+
+// ── FILTER (placeholder) ──
+function filterProds(btn,type){
+  document.querySelectorAll('.pf').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+</script>
+</body>
+</html>
