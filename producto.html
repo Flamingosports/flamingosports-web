@@ -13,6 +13,10 @@
 <meta property="og:type" content="product">
 <meta property="og:locale" content="es_CL">
 <meta property="og:site_name" content="Flamingo Sports">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" id="tw-title" content="Flamingo Sports — Calcetines Técnicos para Tenis y Pádel">
+<meta name="twitter:description" id="tw-desc" content="Calcetines técnicos de alto rendimiento para tenis y pádel. Talla única 36–44 unisex.">
+<meta name="twitter:image" id="tw-image" content="https://www.flamingosports.cl/images/hero.jpg">
 <style>
 @font-face{font-family:'Causten';src:url('fonts/Causten-Black.ttf') format('truetype');font-weight:900;font-style:normal;font-display:swap;}
 @font-face{font-family:'Causten';src:url('fonts/Causten-ExtraBold.ttf') format('truetype');font-weight:800;font-style:normal;font-display:swap;}
@@ -180,7 +184,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 }
 .not-found strong{display:block;font-family:var(--r);font-size:20px;font-weight:900;color:var(--navy);margin-bottom:12px;}
 
-footer-simple{display:block;background:#0e1e32;padding:24px 6vw;text-align:center;}
+footer.footer-simple{display:block;background:#0e1e32;padding:24px 6vw;text-align:center;}
 .footer-copy{font-family:var(--i);font-size:11px;color:rgba(255,255,255,.2);}
 
 @media(max-width:900px){
@@ -377,9 +381,9 @@ const CATALOGO = {
   <span class="lb-next" onclick="lbMove(1)">&#8594;</span>
 </div>
 
-<footer-simple>
+<footer class="footer-simple">
   <p class="footer-copy">© 2026 Flamingo Sports · Santiago, Chile</p>
-</footer-simple>
+</footer>
 
 <script>
 const params  = new URLSearchParams(window.location.search);
@@ -402,6 +406,9 @@ if (!prod) {
   document.getElementById('og-desc').setAttribute('content', `${prod.tipo} para tenis y pádel. Talla única 36–44 unisex. Amortiguación, compresión y ventilación activa. Envío a todo Chile.`);
   document.getElementById('og-image').setAttribute('content', `https://www.flamingosports.cl/${prod.fotos[0]}`);
   document.getElementById('og-url').setAttribute('content', `https://www.flamingosports.cl/producto.html?id=${id}`);
+  document.getElementById('tw-title').setAttribute('content', `${prod.nombre} ${prod.color} — ${prod.tipo} Flamingo Sports`);
+  document.getElementById('tw-desc').setAttribute('content', `${prod.tipo} para tenis y pádel. Talla única 36–44 unisex. Amortiguación, compresión y ventilación activa.`);
+  document.getElementById('tw-image').setAttribute('content', `https://www.flamingosports.cl/${prod.fotos[0]}`);
 
   // Product JSON-LD Schema
   const _schema = {
