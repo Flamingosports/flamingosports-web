@@ -3,16 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title id="page-title">Flamingo Sports</title>
-<meta name="description" content="Calcetines técnicos de alto rendimiento para tenis y pádel.">
+<title id="page-title">Flamingo Sports — Calcetines Técnicos para Tenis y Pádel</title>
+<meta name="description" id="page-desc" content="Calcetines técnicos de alto rendimiento para tenis y pádel. Talla única 36–44 unisex. Amortiguación, compresión en arco y ventilación activa. Disponibles en MercadoLibre.">
+<link rel="canonical" id="page-canonical" href="https://www.flamingosports.cl/producto.html">
+<meta property="og:title" id="og-title" content="Flamingo Sports — Calcetines Técnicos para Tenis y Pádel">
+<meta property="og:description" id="og-desc" content="Calcetines técnicos de alto rendimiento para tenis y pádel.">
+<meta property="og:image" id="og-image" content="https://www.flamingosports.cl/images/hero.jpg">
+<meta property="og:url" id="og-url" content="https://www.flamingosports.cl/producto.html">
+<meta property="og:type" content="product">
+<meta property="og:locale" content="es_CL">
+<meta property="og:site_name" content="Flamingo Sports">
 <style>
-@font-face{font-family:'Causten';src:url('fonts/Causten-Black.ttf') format('truetype');font-weight:900;font-style:normal;}
-@font-face{font-family:'Causten';src:url('fonts/Causten-ExtraBold.ttf') format('truetype');font-weight:800;font-style:normal;}
-@font-face{font-family:'Causten';src:url('fonts/Causten-Bold.ttf') format('truetype');font-weight:700;font-style:normal;}
-@font-face{font-family:'Causten';src:url('fonts/Causten-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;}
-@font-face{font-family:'Causten';src:url('fonts/Causten-Medium.ttf') format('truetype');font-weight:500;font-style:normal;}
-@font-face{font-family:'Causten';src:url('fonts/Causten-Regular.ttf') format('truetype');font-weight:400;font-style:normal;}
-@font-face{font-family:'Causten';src:url('fonts/Causten-Light.ttf') format('truetype');font-weight:300;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Black.ttf') format('truetype');font-weight:900;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-ExtraBold.ttf') format('truetype');font-weight:800;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Medium.ttf') format('truetype');font-weight:500;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Light.ttf') format('truetype');font-weight:300;font-style:normal;font-display:swap;}
 </style>
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
@@ -386,7 +394,39 @@ if (!prod) {
       <a href="productos.html" style="color:var(--coral);font-family:var(--r);font-weight:700;letter-spacing:1px;">← Ver catálogo completo</a>
     </div>`;
 } else {
-  document.title = `${prod.nombre} ${prod.color} — Flamingo Sports`;
+  document.title = `${prod.nombre} ${prod.color} — ${prod.tipo} para Tenis y Pádel | Flamingo Sports`;
+  document.getElementById('page-title').textContent = document.title;
+  document.getElementById('page-desc').setAttribute('content', `${prod.tipo} Flamingo Sports ${prod.color}. Talla única 36–44 unisex. Amortiguación, compresión en arco y ventilación activa para tenis y pádel. Disponible en MercadoLibre Chile.`);
+  document.getElementById('page-canonical').setAttribute('href', `https://www.flamingosports.cl/producto.html?id=${id}`);
+  document.getElementById('og-title').setAttribute('content', `${prod.nombre} ${prod.color} — ${prod.tipo} Flamingo Sports`);
+  document.getElementById('og-desc').setAttribute('content', `${prod.tipo} para tenis y pádel. Talla única 36–44 unisex. Amortiguación, compresión y ventilación activa. Envío a todo Chile.`);
+  document.getElementById('og-image').setAttribute('content', `https://www.flamingosports.cl/${prod.fotos[0]}`);
+  document.getElementById('og-url').setAttribute('content', `https://www.flamingosports.cl/producto.html?id=${id}`);
+
+  // Product JSON-LD Schema
+  const _schema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": `${prod.nombre} ${prod.color} — ${prod.tipo} Flamingo Sports`,
+    "description": prod.descripcion,
+    "image": prod.fotos.map(f => `https://www.flamingosports.cl/${f}`),
+    "sku": id,
+    "brand": {"@type": "Brand", "name": "Flamingo Sports"},
+    "category": "Calcetines deportivos para tenis y pádel",
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "CLP",
+      "price": "8990",
+      "availability": "https://schema.org/InStock",
+      "url": prod.comprar,
+      "seller": {"@type": "Organization", "name": "Flamingo Sports"}
+    }
+  };
+  const _el = document.createElement('script');
+  _el.type = 'application/ld+json';
+  _el.textContent = JSON.stringify(_schema);
+  document.head.appendChild(_el);
+
   document.getElementById('bc-name').textContent = `${prod.nombre} ${prod.color}`;
 
   page.innerHTML = `
