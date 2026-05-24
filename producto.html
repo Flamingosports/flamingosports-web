@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title id="page-title">Flamingo Sports</title>
+<meta name="description" content="Calcetines técnicos de alto rendimiento para tenis y pádel.">
+<style>
+@font-face{font-family:'Causten';src:url('fonts/Causten-Black.ttf') format('truetype');font-weight:900;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-ExtraBold.ttf') format('truetype');font-weight:800;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Bold.ttf') format('truetype');font-weight:700;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-SemiBold.ttf') format('truetype');font-weight:600;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Medium.ttf') format('truetype');font-weight:500;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Regular.ttf') format('truetype');font-weight:400;font-style:normal;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Light.ttf') format('truetype');font-weight:300;font-style:normal;}
+</style>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#1B2D4A;--coral:#F0907C;--teal:#00B5BD;--cream:#F7F4F0;--white:#fff;--text:#1a1a1a;--muted:#666;--r:'Causten',sans-serif;--i:'Causten',sans-serif;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--i);color:var(--text);background:var(--cream);}
+img{display:block;max-width:100%;}
+a{text-decoration:none;color:inherit;}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 5vw;background:rgba(27,45,74,0.95);backdrop-filter:blur(10px);}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo img{height:28px;width:28px;object-fit:contain;filter:invert(1) brightness(2);}
+.nav-logo-text{font-family:var(--r);font-size:14px;font-weight:800;letter-spacing:5px;color:white;text-transform:uppercase;}
+.nav-links{display:flex;align-items:center;gap:28px;}
+.nav-link{font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);transition:color .2s;}
+.nav-link:hover{color:var(--coral);}
+.nav-cta{font-family:var(--r);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:var(--coral);color:white;padding:9px 20px;border-radius:2px;}
+
+/* BREADCRUMB */
+.breadcrumb{padding:88px 6vw 0;background:var(--cream);}
+.bc-inner{display:flex;align-items:center;gap:8px;font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);padding:16px 0;}
+.bc-inner a{color:var(--muted);transition:color .2s;}
+.bc-inner a:hover{color:var(--navy);}
+.bc-sep{color:#bbb;}
+
+/* PAGE LAYOUT */
+.product-page{
+  display:grid;
+  grid-template-columns:55% 1fr;
+  gap:60px;
+  padding:24px 6vw 100px;
+  background:var(--cream);
+  min-height:80vh;
+}
+
+/* GALLERY */
+.gallery-col{position:sticky;top:80px;align-self:start;}
+.main-photo{
+  aspect-ratio:1/1;
+  background:#e4eef8;
+  border-radius:6px;
+  overflow:hidden;
+  margin-bottom:10px;
+  cursor:zoom-in;
+}
+.main-photo img{
+  width:100%;height:100%;
+  object-fit:contain;
+  padding:32px;
+  transition:opacity .2s;
+}
+.thumbs{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:8px;
+}
+.thumb{
+  aspect-ratio:1/1;
+  border-radius:4px;
+  overflow:hidden;
+  cursor:pointer;
+  border:2px solid transparent;
+  background:#dde8f4;
+  transition:border-color .2s;
+}
+.thumb img{width:100%;height:100%;object-fit:cover;}
+.thumb.active{border-color:var(--navy);}
+.thumb:hover:not(.active){border-color:var(--coral);}
+
+/* LIGHTBOX */
+.lightbox{
+  display:none;position:fixed;inset:0;z-index:500;
+  background:rgba(0,0,0,.88);
+  align-items:center;justify-content:center;
+}
+.lightbox.open{display:flex;}
+.lb-img{max-width:90vw;max-height:90vh;object-fit:contain;border-radius:4px;}
+.lb-close{position:fixed;top:20px;right:28px;font-size:32px;color:white;cursor:pointer;line-height:1;opacity:.7;}
+.lb-close:hover{opacity:1;}
+.lb-prev,.lb-next{position:fixed;top:50%;transform:translateY(-50%);font-size:28px;color:white;cursor:pointer;opacity:.6;padding:12px;user-select:none;}
+.lb-prev:hover,.lb-next:hover{opacity:1;}
+.lb-prev{left:16px;}
+.lb-next{right:16px;}
+
+/* INFO */
+.info-col{padding-top:4px;}
+.detail-type{
+  display:inline-block;
+  font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  background:var(--navy);color:white;
+  padding:5px 12px;border-radius:2px;
+  margin-bottom:14px;
+}
+.detail-name{
+  font-family:var(--r);
+  font-size:clamp(40px,4.5vw,62px);
+  font-weight:900;
+  color:var(--navy);
+  letter-spacing:-2px;
+  line-height:.95;
+  margin-bottom:6px;
+}
+.detail-color{
+  font-family:var(--i);font-size:15px;color:var(--muted);
+  margin-bottom:28px;
+}
+.divider{height:1px;background:#d5d0c8;margin-bottom:24px;}
+
+.detail-desc{
+  font-family:var(--i);font-size:14px;line-height:1.8;color:var(--text);
+  margin-bottom:28px;
+}
+
+/* SPECS GRID */
+.specs{
+  display:grid;grid-template-columns:1fr 1fr;gap:8px;
+  margin-bottom:28px;
+}
+.spec{background:white;border-radius:4px;padding:12px 16px;}
+.spec-label{font-family:var(--r);font-size:8px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:3px;}
+.spec-val{font-family:var(--r);font-size:12px;font-weight:800;color:var(--navy);}
+
+/* TALLAS */
+.size-section{margin-bottom:28px;}
+.size-title{font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+.size-opts{display:flex;gap:8px;flex-wrap:wrap;}
+.size-btn{
+  font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:1px;
+  padding:10px 18px;border:2px solid #d5d0c8;border-radius:2px;
+  background:white;color:var(--navy);cursor:pointer;transition:all .2s;
+}
+.size-btn:hover,.size-btn.sel{background:var(--navy);border-color:var(--navy);color:white;}
+
+/* BUY */
+.btn-buy{
+  display:block;text-align:center;
+  font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;
+  background:var(--coral);color:white;
+  padding:17px 32px;border-radius:2px;
+  transition:background .2s;
+  margin-bottom:16px;
+}
+.btn-buy:hover{background:#d97a68;}
+.btn-back{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
+  color:var(--muted);transition:color .2s;
+}
+.btn-back:hover{color:var(--navy);}
+
+/* NOT FOUND */
+.not-found{
+  grid-column:1/-1;text-align:center;padding:80px 20px;
+  font-family:var(--i);color:var(--muted);font-size:15px;
+}
+.not-found strong{display:block;font-family:var(--r);font-size:20px;font-weight:900;color:var(--navy);margin-bottom:12px;}
+
+footer-simple{display:block;background:#0e1e32;padding:24px 6vw;text-align:center;}
+.footer-copy{font-family:var(--i);font-size:11px;color:rgba(255,255,255,.2);}
+
+@media(max-width:900px){
+  .product-page{grid-template-columns:1fr;gap:32px;padding:16px 5vw 80px;}
+  .gallery-col{position:static;}
+  .info-col{padding-top:0;}
+  .thumbs{grid-template-columns:repeat(5,1fr);}
+}
+@media(max-width:768px){
+  nav .nav-link{display:none;}
+  .detail-name{font-size:clamp(36px,10vw,52px);}
+  .specs{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<script>
+/* =====================================================
+   CATÁLOGO DETALLADO — EDITAR AQUÍ
+   Agrega un bloque por cada variante de color.
+   El "id" es lo que va en la URL: producto.html?id=parina-negro
+
+   Campos:
+   - nombre, color, tipo
+   - descripcion: párrafo técnico
+   - material: composición del tejido
+   - tallas: array de tallas disponibles
+   - fotos: rutas relativas desde sitio-web/ (primera foto = portada)
+   - comprar: URL de MercadoLibre
+===================================================== */
+const CATALOGO = {
+
+  'parina-negro': {
+    nombre:      'Parina',
+    color:       'Negro',
+    tipo:        'Calcetín corto',
+    descripcion: 'Calcetín técnico de alto rendimiento diseñado para tenis y pádel. Zona de amortiguación reforzada en talón y antepié para absorber el impacto en cancha. Compresión en el arco plantar para mayor estabilidad y reducción de fatiga. Ventilación activa en el empeine para mantener el pie fresco durante el juego.',
+    material:    '78% Nylon · 18% Elastano · 4% Spandex',
+    tallas:      ['S (36–39)', 'M (40–43)', 'L (44–46)'],
+    fotos: [
+      'productos/Parina/Negro/FlamingoSport-182.jpg',
+      'productos/Parina/Negro/FLAMINGO-6.jpg',
+      'productos/Parina/Negro/FLAMINGO-11.jpg',
+      'productos/Parina/Negro/FLAMINGO-15.jpg',
+      'productos/Parina/Negro/FLAMINGO-16.jpg',
+    ],
+    comprar: 'https://www.mercadolibre.cl/par-calcetines-deportivos-flamingo-sport-varios-colores/up/MLCU3895368728?product_trigger_id=MLCU3895379816&pdp_filters=seller_id%3A56062975&applied_product_filters=MLCU3895367228&picker=true&quantity=1',
+  },
+
+};
+</script>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo-negro.png" alt="Flamingo">
+    <span class="nav-logo-text">Flamingo</span>
+  </a>
+  <div class="nav-links">
+    <a href="index.html#coleccion" class="nav-link">Inicio</a>
+    <a href="productos.html" class="nav-link">Productos</a>
+    <a href="nosotros.html" class="nav-link">Nosotros</a>
+    <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="nav-cta">Instagram</a>
+  </div>
+</nav>
+
+<div class="breadcrumb">
+  <div class="bc-inner">
+    <a href="index.html">Inicio</a>
+    <span class="bc-sep">›</span>
+    <a href="productos.html">Productos</a>
+    <span class="bc-sep">›</span>
+    <span id="bc-name"></span>
+  </div>
+</div>
+
+<div class="product-page" id="product-page">
+  <!-- filled by JS -->
+</div>
+
+<div class="lightbox" id="lightbox">
+  <span class="lb-close" onclick="closeLightbox()">✕</span>
+  <span class="lb-prev" onclick="lbMove(-1)">&#8592;</span>
+  <img class="lb-img" id="lb-img" src="" alt="">
+  <span class="lb-next" onclick="lbMove(1)">&#8594;</span>
+</div>
+
+<footer-simple>
+  <p class="footer-copy">© 2026 Flamingo Sports · Santiago, Chile</p>
+</footer-simple>
+
+<script>
+const params  = new URLSearchParams(window.location.search);
+const id      = params.get('id') || '';
+const prod    = CATALOGO[id];
+const page    = document.getElementById('product-page');
+
+if (!prod) {
+  page.innerHTML = `
+    <div class="not-found">
+      <strong>Producto no encontrado</strong>
+      <a href="productos.html" style="color:var(--coral);font-family:var(--r);font-weight:700;letter-spacing:1px;">← Ver catálogo completo</a>
+    </div>`;
+} else {
+  document.title = `${prod.nombre} ${prod.color} — Flamingo Sports`;
+  document.getElementById('bc-name').textContent = `${prod.nombre} ${prod.color}`;
+
+  page.innerHTML = `
+    <div class="gallery-col">
+      <div class="main-photo" onclick="openLightbox(currentPhoto)">
+        <img id="main-img" src="${prod.fotos[0]}" alt="${prod.nombre} ${prod.color}">
+      </div>
+      <div class="thumbs" id="thumbs"></div>
+    </div>
+    <div class="info-col">
+      <span class="detail-type">${prod.tipo}</span>
+      <h1 class="detail-name">${prod.nombre}</h1>
+      <p class="detail-color">${prod.color}</p>
+      <div class="divider"></div>
+      <p class="detail-desc">${prod.descripcion}</p>
+      <div class="specs">
+        <div class="spec"><div class="spec-label">Tipo</div><div class="spec-val">${prod.tipo}</div></div>
+        <div class="spec"><div class="spec-label">Material</div><div class="spec-val">${prod.material}</div></div>
+        <div class="spec"><div class="spec-label">Uso</div><div class="spec-val">Tenis · Pádel</div></div>
+        <div class="spec"><div class="spec-label">Origen</div><div class="spec-val">Chile</div></div>
+      </div>
+      <div class="size-section">
+        <div class="size-title">Talla</div>
+        <div class="size-opts" id="size-opts">
+          ${prod.tallas.map((t,i) => `<button class="size-btn${i===0?' sel':''}" onclick="selSize(this)">${t}</button>`).join('')}
+        </div>
+      </div>
+      <a href="${prod.comprar}" id="btn-buy" class="btn-buy" target="_blank">Comprar en MercadoLibre</a>
+      <a href="productos.html" class="btn-back">← Ver todos los productos</a>
+    </div>`;
+
+  // Gallery
+  let currentPhoto = 0;
+  const mainImg = document.getElementById('main-img');
+  const thumbsEl = document.getElementById('thumbs');
+
+  function setPhoto(idx) {
+    currentPhoto = idx;
+    mainImg.style.opacity = '0';
+    setTimeout(() => {
+      mainImg.src = prod.fotos[idx];
+      mainImg.alt = `${prod.nombre} ${prod.color} — vista ${idx + 1}`;
+      mainImg.style.opacity = '1';
+    }, 150);
+    thumbsEl.querySelectorAll('.thumb').forEach((t, i) => t.classList.toggle('active', i === idx));
+  }
+
+  thumbsEl.innerHTML = prod.fotos.map((f, i) =>
+    `<div class="thumb${i===0?' active':''}" onclick="setPhoto(${i})"><img src="${f}" alt="Vista ${i+1}" loading="lazy"></div>`
+  ).join('');
+
+  // Lightbox
+  window.openLightbox = function(idx) {
+    currentPhoto = idx;
+    document.getElementById('lb-img').src = prod.fotos[idx];
+    document.getElementById('lightbox').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  };
+  window.closeLightbox = function() {
+    document.getElementById('lightbox').classList.remove('open');
+    document.body.style.overflow = '';
+  };
+  window.lbMove = function(dir) {
+    const next = (currentPhoto + dir + prod.fotos.length) % prod.fotos.length;
+    setPhoto(next);
+    document.getElementById('lb-img').src = prod.fotos[next];
+  };
+  document.getElementById('lightbox').addEventListener('click', function(e) {
+    if (e.target === this) closeLightbox();
+  });
+
+  window.setPhoto = setPhoto;
+  window.selSize = function(btn) {
+    document.querySelectorAll('.size-btn').forEach(b => b.classList.remove('sel'));
+    btn.classList.add('sel');
+  };
+}
+
+document.addEventListener('keydown', e => {
+  const lb = document.getElementById('lightbox');
+  if (!lb.classList.contains('open')) return;
+  if (e.key === 'Escape') closeLightbox();
+  if (e.key === 'ArrowRight') lbMove(1);
+  if (e.key === 'ArrowLeft')  lbMove(-1);
+});
+</script>
+</body>
+</html>
