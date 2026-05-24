@@ -146,6 +146,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
   background:white;color:var(--navy);cursor:pointer;transition:all .2s;
 }
 .size-btn:hover,.size-btn.sel{background:var(--navy);border-color:var(--navy);color:white;}
+.size-btn.unica{cursor:default;background:var(--navy);border-color:var(--navy);color:white;}
 
 /* BUY */
 .btn-buy{
@@ -203,23 +204,132 @@ footer-simple{display:block;background:#0e1e32;padding:24px 6vw;text-align:cente
    - fotos: rutas relativas desde sitio-web/ (primera foto = portada)
    - comprar: URL de MercadoLibre
 ===================================================== */
+// Descripción base compartida por todos los modelos
+const DESC = {
+  corto:  'Fabricado en poliamida de alta resistencia, el {nombre} es el compañero que no te va a fallar en cancha. Ventilación activa para que el pie respire, refuerzo en talón y puntera para los movimientos más bruscos, y sistema de compresión en el arco que se siente desde el primer juego. Se adapta entre el 36 y el 44 — talla única unisex.',
+  medio:  'Fabricado en poliamida de alta resistencia, el {nombre} ofrece mayor cobertura en el tobillo sin sacrificar movilidad. Ventilación activa en el empeine, refuerzo en talón y puntera, y compresión en el arco para mantenerte estable en cada punto. Se adapta entre el 36 y el 44 — talla única unisex.',
+  largo:  'Fabricado en poliamida de alta resistencia, el {nombre} es el calcetín de caña alta que elige quien no quiere compromisos. Máxima cobertura, ventilación activa, refuerzo en talón y puntera, y compresión en el arco. Se adapta entre el 36 y el 44 — talla única unisex.',
+};
+
+const ML = 'https://www.mercadolibre.cl/par-calcetines-deportivos-flamingo-sport-varios-colores/up/MLCU3895368728?product_trigger_id=MLCU3895379816&pdp_filters=seller_id%3A56062975&applied_product_filters=MLCU3895367228&picker=true&quantity=1';
+
 const CATALOGO = {
 
   'parina-negro': {
-    nombre:      'Parina',
-    color:       'Negro',
-    tipo:        'Calcetín corto',
-    descripcion: 'Calcetín técnico de alto rendimiento diseñado para tenis y pádel. Zona de amortiguación reforzada en talón y antepié para absorber el impacto en cancha. Compresión en el arco plantar para mayor estabilidad y reducción de fatiga. Ventilación activa en el empeine para mantener el pie fresco durante el juego.',
-    material:    '78% Nylon · 18% Elastano · 4% Spandex',
-    tallas:      ['S (36–39)', 'M (40–43)', 'L (44–46)'],
-    fotos: [
-      'productos/Parina/Negro/FlamingoSport-182.jpg',
-      'productos/Parina/Negro/FLAMINGO-6.jpg',
-      'productos/Parina/Negro/FLAMINGO-11.jpg',
-      'productos/Parina/Negro/FLAMINGO-15.jpg',
-      'productos/Parina/Negro/FLAMINGO-16.jpg',
-    ],
-    comprar: 'https://www.mercadolibre.cl/par-calcetines-deportivos-flamingo-sport-varios-colores/up/MLCU3895368728?product_trigger_id=MLCU3895379816&pdp_filters=seller_id%3A56062975&applied_product_filters=MLCU3895367228&picker=true&quantity=1',
+    nombre: 'Parina', color: 'Negro', tipo: 'Calcetín corto',
+    descripcion: DESC.corto.replace('{nombre}', 'Parina'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/parina-negro-1.jpg','images/parina-negro-2.jpg','images/parina-negro-3.jpg','images/parina-negro-4.jpg','images/parina-negro-5.jpg'],
+    comprar: ML,
+  },
+
+  'parina-amarillo': {
+    nombre: 'Parina', color: 'Amarillo Flúor', tipo: 'Calcetín corto',
+    descripcion: DESC.corto.replace('{nombre}', 'Parina'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/parina-amarillo-1.jpg','images/parina-amarillo-2.jpg'],
+    comprar: ML,
+  },
+
+  'aananuca-negro': {
+    nombre: 'Añañuca', color: 'Negro', tipo: 'Calcetín medio',
+    descripcion: DESC.medio.replace('{nombre}', 'Añañuca'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/aananuca-negro-1.jpg','images/aananuca-negro-2.jpg','images/aananuca-negro-3.jpg','images/aananuca-negro-4.jpg','images/aananuca-negro-5.jpg','images/aananuca-negro-6.jpg','images/aananuca-negro-7.jpg','images/aananuca-negro-8.jpg','images/aananuca-negro-9.jpg'],
+    comprar: ML,
+  },
+
+  'aananuca-pink': {
+    nombre: 'Añañuca', color: 'Pink', tipo: 'Calcetín medio',
+    descripcion: DESC.medio.replace('{nombre}', 'Añañuca'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/aananuca-pink-1.jpg','images/aananuca-pink-2.jpg','images/aananuca-pink-3.jpg','images/aananuca-pink-4.jpg','images/aananuca-pink-5.jpg'],
+    comprar: ML,
+  },
+
+  'mamalluca-lila': {
+    nombre: 'Mamalluca', color: 'Lila', tipo: 'Calcetín medio',
+    descripcion: DESC.medio.replace('{nombre}', 'Mamalluca'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/mamalluca-lila-1.jpg','images/mamalluca-lila-2.jpg','images/mamalluca-lila-3.jpg'],
+    comprar: ML,
+  },
+
+  'mamalluca-morado': {
+    nombre: 'Mamalluca', color: 'Morado', tipo: 'Calcetín medio',
+    descripcion: DESC.medio.replace('{nombre}', 'Mamalluca'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/mamalluca-morado-1.jpg','images/mamalluca-morado-2.jpg'],
+    comprar: ML,
+  },
+
+  'mamalluca-celeste': {
+    nombre: 'Mamalluca', color: 'Celeste', tipo: 'Calcetín medio',
+    descripcion: DESC.medio.replace('{nombre}', 'Mamalluca'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/mamalluca-celeste-1.jpg','images/mamalluca-celeste-2.jpg','images/mamalluca-celeste-3.jpg'],
+    comprar: ML,
+  },
+
+  'tamarugal-navy': {
+    nombre: 'Tamarugal', color: 'Navy', tipo: 'Calcetín largo',
+    descripcion: DESC.largo.replace('{nombre}', 'Tamarugal'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/tamarugal-navy-1.jpg','images/tamarugal-navy-2.jpg'],
+    comprar: ML,
+  },
+
+  'tamarugal-blanco': {
+    nombre: 'Tamarugal', color: 'Blanco', tipo: 'Calcetín largo',
+    descripcion: DESC.largo.replace('{nombre}', 'Tamarugal'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/tamarugal-blanco-1.jpg','images/tamarugal-blanco-2.jpg'],
+    comprar: ML,
+  },
+
+  'tatio-turquesa': {
+    nombre: 'Tatio', color: 'Turquesa', tipo: 'Calcetín largo',
+    descripcion: DESC.largo.replace('{nombre}', 'Tatio'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/tatio-turquesa-1.jpg','images/tatio-turquesa-2.jpg','images/tatio-turquesa-3.jpg'],
+    comprar: ML,
+  },
+
+  'artemia-gris': {
+    nombre: 'Artemia', color: 'Gris', tipo: 'Calcetín largo',
+    descripcion: DESC.largo.replace('{nombre}', 'Artemia'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/artemia-gris-1.jpg','images/artemia-gris-2.jpg','images/artemia-gris-3.jpg','images/artemia-gris-4.jpg','images/artemia-gris-5.jpg'],
+    comprar: ML,
+  },
+
+  'artemia-blanco': {
+    nombre: 'Artemia', color: 'Blanco y Celeste', tipo: 'Calcetín largo',
+    descripcion: DESC.largo.replace('{nombre}', 'Artemia'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/artemia-blanco-1.jpg','images/artemia-blanco-2.jpg','images/artemia-blanco-3.jpg','images/artemia-blanco-4.jpg','images/artemia-blanco-5.jpg','images/artemia-blanco-6.jpg'],
+    comprar: ML,
+  },
+
+  'artemia-pink': {
+    nombre: 'Artemia', color: 'Pink', tipo: 'Calcetín largo',
+    descripcion: DESC.largo.replace('{nombre}', 'Artemia'),
+    material: '100% Poliamida de alta resistencia',
+    tallas: ['Única (36–44 · Unisex)'],
+    fotos: ['images/artemia-pink-1.jpg','images/artemia-pink-2.jpg','images/artemia-pink-3.jpg','images/artemia-pink-4.jpg','images/artemia-pink-5.jpg'],
+    comprar: ML,
   },
 
 };
@@ -301,7 +411,10 @@ if (!prod) {
       <div class="size-section">
         <div class="size-title">Talla</div>
         <div class="size-opts" id="size-opts">
-          ${prod.tallas.map((t,i) => `<button class="size-btn${i===0?' sel':''}" onclick="selSize(this)">${t}</button>`).join('')}
+          ${prod.tallas.length === 1
+            ? `<button class="size-btn unica" disabled>${prod.tallas[0]}</button>`
+            : prod.tallas.map((t,i) => `<button class="size-btn${i===0?' sel':''}" onclick="selSize(this)">${t}</button>`).join('')
+          }
         </div>
       </div>
       <a href="${prod.comprar}" id="btn-buy" class="btn-buy" target="_blank">Comprar en MercadoLibre</a>
