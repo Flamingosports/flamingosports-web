@@ -143,7 +143,7 @@ nav{
 .products-grid{
   display:grid;grid-template-columns:repeat(4,1fr);gap:16px;
 }
-.product-card{background:white;border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;}
+.product-card{display:block;background:white;border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;color:inherit;text-decoration:none;}
 .product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.12);}
 .product-img{aspect-ratio:1/1;overflow:hidden;}
 .product-img img{transition:transform .5s;}
@@ -364,62 +364,62 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
   <p class="section-p"><strong>Cinco</strong> modelos, <strong>tres</strong> tamaños, <strong>trece</strong> colores.<br><strong>Un</strong> solo estándar técnico.<br>Zonas de amortiguación, compresión en el arco, y ventilación activa.</p>
 
   <div class="products-grid" style="margin-top:40px;">
-    <div class="product-card">
+    <a class="product-card" href="producto.html?id=tatio-turquesa">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-calipso.png" alt="Tatio Calipso" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Tatio</div>
         <div class="product-color">Calipso</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=artemia-pink">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-pink.jpg" alt="Artemia Pink" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Artemia</div>
         <div class="product-color">Pink</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=mamalluca-lila">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-lila.jpg" alt="Mamalluca Lila" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Mamalluca</div>
         <div class="product-color">Lila</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=mamalluca-morado">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-morado.png" alt="Mamalluca Morado" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Mamalluca</div>
         <div class="product-color">Morado</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=artemia-gris">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-gris.jpg" alt="Artemia Gris" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Artemia</div>
         <div class="product-color">Gris</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=artemia-blanco">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-whiteblue.png" alt="Artemia White Blue" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Artemia</div>
         <div class="product-color">White Blue</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=tamarugal-navy">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-navy2.png" alt="Tamarugal Navy" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Tamarugal</div>
         <div class="product-color">Navy</div>
       </div>
-    </div>
-    <div class="product-card">
+    </a>
+    <a class="product-card" href="producto.html?id=tamarugal-blanco">
       <div class="product-img" style="background:#e8f4f8;"><img src="images/col-blanco2.png" alt="Tamarugal Blanco" loading="lazy" style="object-fit:contain;padding:12px;"></div>
       <div class="product-info">
         <div class="product-name">Tamarugal</div>
         <div class="product-color">Blanco</div>
       </div>
-    </div>
+    </a>
   </div>
   <div class="products-cta">
     <a href="productos.html" class="btn btn-coral">Ver todos los productos</a>
