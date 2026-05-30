@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pago confirmado — Flamingo Sports</title>
+<style>
+@font-face{font-family:'Causten';src:url('fonts/Causten-Bold.ttf') format('truetype');font-weight:700;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Regular.ttf') format('truetype');font-weight:400;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Black.ttf') format('truetype');font-weight:900;font-display:swap;}
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#1B2D4A;--coral:#F0907C;--cream:#F7F4F0;}
+body{font-family:'Causten',sans-serif;background:var(--cream);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 20px;}
+.card{background:white;border-radius:4px;padding:56px 48px;max-width:480px;width:100%;text-align:center;box-shadow:0 8px 40px rgba(0,0,0,.08);}
+.icon{font-size:48px;margin-bottom:24px;}
+.titulo{font-family:'Causten',sans-serif;font-size:28px;font-weight:900;color:var(--navy);letter-spacing:-1px;margin-bottom:12px;}
+.bajada{font-size:15px;color:#555;line-height:1.7;margin-bottom:32px;}
+.whatsapp-btn{display:inline-block;background:#25D366;color:white;font-family:'Causten',sans-serif;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:2px;text-decoration:none;margin-bottom:16px;}
+.back-link{display:block;font-family:'Causten',sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;text-decoration:none;margin-top:8px;}
+.back-link:hover{color:var(--navy);}
+.firma{margin-top:40px;font-size:11px;color:#bbb;letter-spacing:1px;}
+</style>
+</head>
+<body>
+<div class="card">
+  <div class="icon">🦩</div>
+  <h1 class="titulo">¡Listo, gracias!</h1>
+  <p class="bajada">
+    Tu pago fue recibido. Te llegará un correo de confirmación de Mercado Pago en breve.<br><br>
+    Coordinamos el despacho por Bluexpress dentro de las próximas 24–48 hrs hábiles. Si tienes alguna consulta, escríbenos directo.
+  </p>
+  <a href="https://wa.me/56992269522?text=Hola%2C%20acabo%20de%20comprar%20en%20la%20web%20y%20quiero%20coordinar%20el%20despacho"
+     class="whatsapp-btn" target="_blank">
+    Coordinar despacho por WhatsApp
+  </a>
+  <a href="productos.html" class="back-link">← Ver más productos</a>
+  <p class="firma">Los Tíos Flamingo · flamingosports.cl</p>
+</div>
+</body>
+</html>
