@@ -555,25 +555,25 @@ window.initMPCheckout = async function() {
   loading.style.display = 'block';
 
   try {
-    const res = await fetch('/.netlify/functions/mp-preference', {
+    const res = await fetch('https://mp-preference.flamingosport-cl.workers.dev', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        productId: prodId,
-        productName: prodData ? `${prodData.nombre} ${prodData.color}` : 'Calcetines Flamingo Sports',
-        productType: prodData ? prodData.tipo : 'Calcetín',
+        items: [{
+          id: prodId,
+          name: prodData ? `${prodData.nombre} ${prodData.color}` : 'Calcetines Flamingo Sports',
+          type: prodData ? prodData.tipo : 'Calcetín',
+          image: prodData ? prodData.fotos[0] : '',
+          price: 8990,
+          qty: 1,
+        }]
       }),
     });
 
     const data = await res.json();
-    if (!data.preference_id) throw new Error('Sin preference_id');
+    if (!data.init_point) throw new Error('Sin init_point');
 
-    const mp = new MercadoPago(window.MP_PUBLIC_KEY, { locale: 'es-CL' });
-    const checkout = mp.checkout({
-      preference: { id: data.preference_id },
-      render: { container: null, label: 'Pagar' },
-    });
-    checkout.open();
+    window.location.href = data.init_point;
 
   } catch (err) {
     console.error('MP error:', err);

@@ -95,11 +95,9 @@ async function cartCheckout() {
       body: JSON.stringify({ items }),
     });
     const data = await res.json();
-    if (!data.preference_id) throw new Error('Sin preference_id');
+    if (!data.init_point) throw new Error('Sin init_point');
 
-    const mp       = new MercadoPago(window.MP_PUBLIC_KEY, { locale: 'es-CL' });
-    const checkout = mp.checkout({ preference: { id: data.preference_id }, render: { container: null } });
-    checkout.open();
+    window.location.href = data.init_point;
   } catch (err) {
     console.error('Cart checkout error:', err);
     alert('Hubo un problema al abrir el pago. Inténtalo de nuevo.');

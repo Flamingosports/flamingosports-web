@@ -90,7 +90,7 @@ export default {
       });
     }
 
-    return new Response(JSON.stringify({ preference_id: mpData.id }), {
+    return new Response(JSON.stringify({ preference_id: mpData.id, init_point: mpData.init_point }), {
       status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
