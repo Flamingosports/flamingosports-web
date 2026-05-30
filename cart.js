@@ -3,7 +3,7 @@
    Estado en localStorage, drawer lateral, checkout MP
    ===================================================== */
 
-const WORKER_URL = 'https://mp-preference.flamingosports.workers.dev';
+const WORKER_URL = 'https://mp-preference.flamingosport-cl.workers.dev';
 const PRICE      = 8990;
 const CART_KEY   = 'flamingo_cart';
 
