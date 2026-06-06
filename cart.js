@@ -4,7 +4,7 @@
    ===================================================== */
 
 const WORKER_URL = 'https://mp-preference.flamingosport-cl.workers.dev';
-const PRICE      = 8990;
+const PRICE      = 9990;
 const CART_KEY   = 'flamingo_cart';
 
 // ── Estado del carrito ────────────────────────────────

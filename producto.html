@@ -492,8 +492,8 @@ if (!prod) {
           }
         </div>
       </div>
-      <button class="btn-add-cart" onclick="Cart.add({ id: '${id}', name: '${prod.nombre} ${prod.color}', type: '${prod.tipo}', image: '${prod.fotos[0]}', price: 8990 })">Agregar al carrito</button>
-      <button id="btn-buy" class="btn-buy" onclick="initMPCheckout()">Comprar ahora — $8.990</button>
+      <button class="btn-add-cart" onclick="Cart.add({ id: '${id}', name: '${prod.nombre} ${prod.color}', type: '${prod.tipo}', image: '${prod.fotos[0]}', price: 9990 })">Agregar al carrito</button>
+      <button id="btn-buy" class="btn-buy" onclick="initMPCheckout()">Comprar ahora — $9.990</button>
       <p class="mp-loading" id="mp-loading">Abriendo pago seguro…</p>
       <a href="${prod.comprar}" class="btn-ml" target="_blank">Ver también en MercadoLibre</a>
       <a href="productos.html" class="btn-back">← Ver todos los productos</a>
@@ -592,7 +592,7 @@ window.initMPCheckout = async function() {
     alert('Hubo un problema al abrir el pago. Inténtalo de nuevo o contáctanos por WhatsApp.');
   } finally {
     btn.disabled = false;
-    btn.textContent = 'Comprar — $8.990';
+    btn.textContent = 'Comprar — $9.990';
     loading.style.display = 'none';
   }
 };
