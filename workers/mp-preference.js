@@ -1,9 +1,10 @@
 /* =====================================================
    Cloudflare Worker — Flamingo Sports
    Variables requeridas en Cloudflare:
-     MP_ACCESS_TOKEN  — Mercado Pago Access Token producción
-     BREVO_API_KEY    — API key de Brevo
-     REVIEW_FORM_URL  — URL del Google Form de reviews (opcional)
+     MP_ACCESS_TOKEN    — Mercado Pago Access Token producción
+     BREVO_API_KEY      — API key de Brevo
+     REVIEW_FORM_URL    — URL del Google Form de reviews (opcional)
+     IG_ACCESS_TOKEN    — Instagram Graph API long-lived token
    ===================================================== */
 
 const ALLOWED_ORIGINS = [
@@ -18,11 +19,34 @@ export default {
     const corsOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
     const cors = {
       'Access-Control-Allow-Origin': corsOrigin,
-      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type',
     };
 
     if (request.method === 'OPTIONS') return new Response(null, { status: 204, headers: cors });
+
+    // ── GET /ig-feed — Feed Instagram dinámico ──────
+    const url = new URL(request.url);
+    if (request.method === 'GET' && url.pathname === '/ig-feed') {
+      const igToken = env.IG_ACCESS_TOKEN || 'IGAAVRTHqKIbZABZAFl4V1BYdHBXa2lZAWnZAtVVRuZA0Y4QjlROXg4My0wcXN3RDc4M0haT1BSbG42aks3MWctXy1PVzExWVRBaTdLMy1XNjd2Q29lell3dkdLLVpCMmgzVHdXZA1FVT3FscW1KdFl2bTR2TGpB';
+      const igUrl = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=6&access_token=${igToken}`;
+      const igRes = await fetch(igUrl);
+      const igData = await igRes.json();
+      if (!igRes.ok) {
+        return new Response(JSON.stringify({ error: 'Error Instagram API', detail: igData }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+      }
+      const posts = (igData.data || []).map(p => ({
+        id: p.id,
+        type: p.media_type,
+        url: p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url,
+        permalink: p.permalink,
+      }));
+      return new Response(JSON.stringify(posts), {
+        status: 200,
+        headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
+      });
+    }
+
     if (request.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: cors });
 
     let body;
