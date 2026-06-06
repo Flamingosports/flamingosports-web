@@ -179,15 +179,6 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 }
 .btn-buy:hover{background:#d97a68;}
 .btn-buy:disabled{background:#ccc;cursor:not-allowed;}
-.btn-ml{
-  display:block;width:100%;text-align:center;
-  font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-  background:transparent;color:var(--muted);
-  padding:10px 32px;border-radius:2px;border:1px solid #ddd;
-  transition:all .2s;margin-bottom:16px;cursor:pointer;
-  text-decoration:none;
-}
-.btn-ml:hover{border-color:var(--navy);color:var(--navy);}
 .mp-loading{display:none;text-align:center;padding:12px 0;font-family:var(--r);font-size:10px;color:var(--muted);letter-spacing:1px;}
 .btn-back{
   display:inline-flex;align-items:center;gap:6px;
@@ -495,8 +486,7 @@ if (!prod) {
       <button class="btn-add-cart" onclick="Cart.add({ id: '${id}', name: '${prod.nombre} ${prod.color}', type: '${prod.tipo}', image: '${prod.fotos[0]}', price: 9990 })">Agregar al carrito</button>
       <button id="btn-buy" class="btn-buy" onclick="initMPCheckout()">Comprar ahora — $9.990</button>
       <p class="mp-loading" id="mp-loading">Abriendo pago seguro…</p>
-      <a href="${prod.comprar}" class="btn-ml" target="_blank">Ver también en MercadoLibre</a>
-      <a href="productos.html" class="btn-back">← Ver todos los productos</a>
+<a href="productos.html" class="btn-back">← Ver todos los productos</a>
     </div>`;
 
   // Gallery
