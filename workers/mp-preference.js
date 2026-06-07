@@ -28,24 +28,26 @@ export default {
     // ── GET /ig-feed — Feed Instagram dinámico ──────
     const url = new URL(request.url);
     if (request.method === 'GET' && url.pathname === '/ig-feed') {
-      const igToken = env.IG_ACCESS_TOKEN;
-      if (!igToken) return new Response(JSON.stringify({ error: 'Token no configurado' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
-      const igUrl = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=6&access_token=${igToken}`;
-      const igRes = await fetch(igUrl);
-      const igData = await igRes.json();
-      if (!igRes.ok) {
-        return new Response(JSON.stringify({ error: 'Error Instagram API', detail: igData }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+      try {
+        const igToken = env.IG_ACCESS_TOKEN;
+        if (!igToken) return new Response(JSON.stringify({ error: 'Token no configurado' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
+        const igUrl = 'https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=6&access_token=' + igToken;
+        const igRes = await fetch(igUrl);
+        const rawText = await igRes.text();
+        if (!igRes.ok || !rawText) {
+          return new Response(JSON.stringify({ error: 'Error Instagram API', status: igRes.status, raw: rawText.slice(0, 300) }), { status: 502, headers: { ...cors, 'Content-Type': 'application/json' } });
+        }
+        const igData = JSON.parse(rawText);
+        const posts = (igData.data || []).map(function(p) {
+          return { id: p.id, type: p.media_type, url: p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url, permalink: p.permalink };
+        });
+        return new Response(JSON.stringify(posts), {
+          status: 200,
+          headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
+        });
+      } catch (e) {
+        return new Response(JSON.stringify({ error: 'Excepcion', detail: e.message }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
       }
-      const posts = (igData.data || []).map(p => ({
-        id: p.id,
-        type: p.media_type,
-        url: p.media_type === 'VIDEO' ? p.thumbnail_url : p.media_url,
-        permalink: p.permalink,
-      }));
-      return new Response(JSON.stringify(posts), {
-        status: 200,
-        headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=3600' },
-      });
     }
 
     if (request.method !== 'POST') return new Response('Method not allowed', { status: 405, headers: cors });
