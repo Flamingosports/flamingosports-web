@@ -237,6 +237,17 @@ document.getElementById('hdr-eyebrow').textContent = PAGINA.eyebrow;
 document.getElementById('hdr-titulo').textContent  = PAGINA.titulo;
 document.getElementById('hdr-sub').innerHTML       = PAGINA.subtitulo;
 
+const COL_MAP = {
+  'tatio-turquesa':  'col-calipso.png',
+  'artemia-pink':    'col-pink.jpg',
+  'mamalluca-lila':  'col-lila.jpg',
+  'mamalluca-morado':'col-morado.png',
+  'artemia-gris':    'col-gris.jpg',
+  'artemia-blanco':  'col-whiteblue.png',
+  'tamarugal-navy':  'col-navy2.png',
+  'tamarugal-blanco':'col-blanco2.png',
+};
+
 function renderGrid(filtro) {
   const grid = document.getElementById('grid');
   const items = filtro === 'todos'
@@ -245,11 +256,14 @@ function renderGrid(filtro) {
 
   grid.innerHTML = items.map(p => `
     <a class="product-card" href="producto.html?id=${p.id}">
-      <div class="product-img"><img src="images/${p.imagen}" alt="${p.alt}" loading="lazy"></div>
+      <div class="product-img">
+        <img class="img-main" src="images/${COL_MAP[p.id] || p.imagen}" alt="${p.alt}" loading="lazy">
+        <img class="img-hover" src="images/${p.id}-2.jpg" alt="${p.alt}" loading="lazy">
+      </div>
       <div class="product-info">
         <div class="product-name">${p.nombre}</div>
         <div class="product-color">${p.color}</div>
-        <span class="product-type">${p.tipo}</span>
+        <span class="product-type">${p.tipo} · Tenis y Pádel</span>
       </div>
     </a>
   `).join('');
