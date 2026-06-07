@@ -28,7 +28,8 @@ export default {
     // ── GET /ig-feed — Feed Instagram dinámico ──────
     const url = new URL(request.url);
     if (request.method === 'GET' && url.pathname === '/ig-feed') {
-      const igToken = env.IG_ACCESS_TOKEN || 'IGAAVRTHqKIbZABZAFl4V1BYdHBXa2lZAWnZAtVVRuZA0Y4QjlROXg4My0wcXN3RDc4M0haT1BSbG42aks3MWctXy1PVzExWVRBaTdLMy1XNjd2Q29lell3dkdLLVpCMmgzVHdXZA1FVT3FscW1KdFl2bTR2TGpB';
+      const igToken = env.IG_ACCESS_TOKEN;
+      if (!igToken) return new Response(JSON.stringify({ error: 'Token no configurado' }), { status: 500, headers: { ...cors, 'Content-Type': 'application/json' } });
       const igUrl = `https://graph.instagram.com/me/media?fields=id,media_type,media_url,thumbnail_url,permalink&limit=6&access_token=${igToken}`;
       const igRes = await fetch(igUrl);
       const igData = await igRes.json();
