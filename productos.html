@@ -70,6 +70,7 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .product-img .img-hover{position:absolute;inset:0;object-fit:cover;padding:0;opacity:0;}
 .product-card:hover .product-img .img-main{opacity:0;}
 .product-card:hover .product-img .img-hover{opacity:1;}
+.img-hover.rotate-cw{transform:rotate(90deg);}
 .product-info{padding:14px 16px 18px;}
 .product-name{font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:4px;}
 .product-color{font-family:var(--i);font-size:12px;color:var(--muted);margin-bottom:8px;}
@@ -199,11 +200,11 @@ const PAGINA = {
       <div class="product-info"><div class="product-name">Mamalluca</div><div class="product-color">Celeste</div><span class="product-type">Calcetín medio · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=tamarugal-navy">
-      <div class="product-img"><img class="img-main" src="images/col-navy2.png" alt="Tamarugal Navy — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/tamarugal-navy-2.jpg" alt="Tamarugal Navy" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/col-navy2.png" alt="Tamarugal Navy — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover rotate-cw" src="images/tamarugal-navy-2.jpg" alt="Tamarugal Navy" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Tamarugal</div><div class="product-color">Navy</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=tamarugal-blanco">
-      <div class="product-img"><img class="img-main" src="images/col-blanco2.png" alt="Tamarugal Blanco — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/tamarugal-blanco-2.jpg" alt="Tamarugal Blanco" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/col-blanco2.png" alt="Tamarugal Blanco — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover rotate-cw" src="images/tamarugal-blanco-2.jpg" alt="Tamarugal Blanco" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Tamarugal</div><div class="product-color">Blanco</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=tatio-turquesa">
@@ -211,7 +212,7 @@ const PAGINA = {
       <div class="product-info"><div class="product-name">Tatio</div><div class="product-color">Turquesa</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-gris">
-      <div class="product-img"><img class="img-main" src="images/col-gris.jpg" alt="Artemia Gris — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-gris-2.jpg" alt="Artemia Gris" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/col-gris.jpg" alt="Artemia Gris — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-gris-3.jpg" alt="Artemia Gris" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Artemia</div><div class="product-color">Gris</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-blanco">
@@ -219,7 +220,7 @@ const PAGINA = {
       <div class="product-info"><div class="product-name">Artemia</div><div class="product-color">Blanco y Celeste</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-pink">
-      <div class="product-img"><img class="img-main" src="images/col-pink.jpg" alt="Artemia Pink — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-pink-2.jpg" alt="Artemia Pink" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/col-pink.jpg" alt="Artemia Pink — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-pink-3.jpg" alt="Artemia Pink" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Artemia</div><div class="product-color">Pink</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
   </div>
@@ -247,6 +248,11 @@ const COL_MAP = {
   'tamarugal-navy':  'col-navy2.png',
   'tamarugal-blanco':'col-blanco2.png',
 };
+const HOVER_MAP = {
+  'artemia-pink': 'artemia-pink-3.jpg',
+  'artemia-gris': 'artemia-gris-3.jpg',
+};
+const ROTATE_HOVER = new Set(['tamarugal-navy', 'tamarugal-blanco']);
 
 function renderGrid(filtro) {
   const grid = document.getElementById('grid');
@@ -258,7 +264,7 @@ function renderGrid(filtro) {
     <a class="product-card" href="producto.html?id=${p.id}">
       <div class="product-img">
         <img class="img-main" src="images/${COL_MAP[p.id] || p.imagen}" alt="${p.alt}" loading="lazy">
-        <img class="img-hover" src="images/${p.id}-2.jpg" alt="${p.alt}" loading="lazy">
+        <img class="img-hover${ROTATE_HOVER.has(p.id) ? ' rotate-cw' : ''}" src="images/${HOVER_MAP[p.id] || (p.id + '-2.jpg')}" alt="${p.alt}" loading="lazy">
       </div>
       <div class="product-info">
         <div class="product-name">${p.nombre}</div>
