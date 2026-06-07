@@ -64,9 +64,11 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
 .product-card{display:block;background:white;border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;color:inherit;text-decoration:none;}
 .product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.1);}
-.product-img{aspect-ratio:1/1;overflow:hidden;}
-.product-img img{transition:transform .5s;}
-.product-card:hover .product-img img{transform:scale(1.06);}
+.product-img{aspect-ratio:1/1;overflow:hidden;position:relative;}
+.product-img img{width:100%;height:100%;object-fit:cover;transition:opacity .4s ease;}
+.product-img .img-hover{position:absolute;inset:0;opacity:0;}
+.product-card:hover .product-img .img-main{opacity:0;}
+.product-card:hover .product-img .img-hover{opacity:1;}
 .product-info{padding:14px 16px 18px;}
 .product-name{font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:4px;}
 .product-color{font-family:var(--i);font-size:12px;color:var(--muted);margin-bottom:8px;}
@@ -168,55 +170,55 @@ const PAGINA = {
   </div>
   <div class="products-grid" id="grid">
     <a class="product-card" href="producto.html?id=parina-negro">
-      <div class="product-img"><img src="images/prod-parina-negro.jpg" alt="Parina Negro — Calcetín Corto para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-parina-negro.jpg" alt="Parina Negro — Calcetín Corto para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/parina-negro-2.jpg" alt="Parina Negro" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Parina</div><div class="product-color">Negro</div><span class="product-type">Calcetín corto · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=parina-amarillo">
-      <div class="product-img"><img src="images/prod-parina-amarillo.jpg" alt="Parina Amarillo Flúor — Calcetín Corto para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-parina-amarillo.jpg" alt="Parina Amarillo Flúor — Calcetín Corto para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/parina-amarillo-2.jpg" alt="Parina Amarillo" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Parina</div><div class="product-color">Amarillo Flúor</div><span class="product-type">Calcetín corto · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=aananuca-negro">
-      <div class="product-img"><img src="images/prod-aananuca-negro.jpg" alt="Añañuca Negro — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-aananuca-negro.jpg" alt="Añañuca Negro — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/aananuca-negro-2.jpg" alt="Añañuca Negro" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Añañuca</div><div class="product-color">Negro</div><span class="product-type">Calcetín medio · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=aananuca-pink">
-      <div class="product-img"><img src="images/prod-aananuca-pink.jpg" alt="Añañuca Pink — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-aananuca-pink.jpg" alt="Añañuca Pink — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/aananuca-pink-2.jpg" alt="Añañuca Pink" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Añañuca</div><div class="product-color">Pink</div><span class="product-type">Calcetín medio · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=mamalluca-lila">
-      <div class="product-img"><img src="images/prod-mamalluca-lila.jpg" alt="Mamalluca Lila — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-mamalluca-lila.jpg" alt="Mamalluca Lila — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/mamalluca-lila-2.jpg" alt="Mamalluca Lila" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Mamalluca</div><div class="product-color">Lila</div><span class="product-type">Calcetín medio · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=mamalluca-morado">
-      <div class="product-img"><img src="images/prod-mamalluca-morado.jpg" alt="Mamalluca Morado — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-mamalluca-morado.jpg" alt="Mamalluca Morado — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/mamalluca-morado-2.jpg" alt="Mamalluca Morado" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Mamalluca</div><div class="product-color">Morado</div><span class="product-type">Calcetín medio · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=mamalluca-celeste">
-      <div class="product-img"><img src="images/prod-mamalluca-celeste.jpg" alt="Mamalluca Celeste — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-mamalluca-celeste.jpg" alt="Mamalluca Celeste — Calcetín Medio para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/mamalluca-celeste-2.jpg" alt="Mamalluca Celeste" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Mamalluca</div><div class="product-color">Celeste</div><span class="product-type">Calcetín medio · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=tamarugal-navy">
-      <div class="product-img"><img src="images/prod-tamarugal-navy.jpg" alt="Tamarugal Navy — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-tamarugal-navy.jpg" alt="Tamarugal Navy — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/tamarugal-navy-2.jpg" alt="Tamarugal Navy" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Tamarugal</div><div class="product-color">Navy</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=tamarugal-blanco">
-      <div class="product-img"><img src="images/prod-tamarugal-blanco.jpg" alt="Tamarugal Blanco — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-tamarugal-blanco.jpg" alt="Tamarugal Blanco — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/tamarugal-blanco-2.jpg" alt="Tamarugal Blanco" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Tamarugal</div><div class="product-color">Blanco</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=tatio-turquesa">
-      <div class="product-img"><img src="images/prod-tatio-turquesa.jpg" alt="Tatio Turquesa — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-tatio-turquesa.jpg" alt="Tatio Turquesa — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/tatio-turquesa-2.jpg" alt="Tatio Turquesa" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Tatio</div><div class="product-color">Turquesa</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-gris">
-      <div class="product-img"><img src="images/prod-artemia-gris.jpg" alt="Artemia Gris — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-artemia-gris.jpg" alt="Artemia Gris — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-gris-2.jpg" alt="Artemia Gris" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Artemia</div><div class="product-color">Gris</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-blanco">
-      <div class="product-img"><img src="images/prod-artemia-blanco.jpg" alt="Artemia Blanco y Celeste — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-artemia-blanco.jpg" alt="Artemia Blanco y Celeste — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-blanco-2.jpg" alt="Artemia Blanco" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Artemia</div><div class="product-color">Blanco y Celeste</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-pink">
-      <div class="product-img"><img src="images/prod-artemia-pink.jpg" alt="Artemia Pink — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"></div>
+      <div class="product-img"><img class="img-main" src="images/prod-artemia-pink.jpg" alt="Artemia Pink — Calcetín Largo para Tenis y Pádel Flamingo Sports" loading="lazy"><img class="img-hover" src="images/artemia-pink-2.jpg" alt="Artemia Pink" loading="lazy"></div>
       <div class="product-info"><div class="product-name">Artemia</div><div class="product-color">Pink</div><span class="product-type">Calcetín largo · Tenis y Pádel</span></div>
     </a>
   </div>
