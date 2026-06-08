@@ -75,6 +75,9 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .product-card:hover .product-img .img-main{opacity:0;}
 .product-card:hover .product-img .img-hover{opacity:1;}
 .img-hover.rotate-cw{transform:rotate(90deg);}
+.card-add-btn{position:absolute;bottom:0;left:0;right:0;z-index:3;background:rgba(27,45,74,.92);color:white;font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;padding:11px;cursor:pointer;opacity:0;transform:translateY(6px);transition:opacity .22s ease,transform .22s ease;}
+.product-card:hover .card-add-btn{opacity:1;transform:translateY(0);}
+.card-add-btn:hover{background:var(--coral);}
 .product-info{padding:14px 16px 18px;}
 .product-name{font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:4px;}
 .product-color{font-family:var(--i);font-size:12px;color:var(--muted);margin-bottom:8px;}
@@ -269,6 +272,7 @@ function renderGrid(filtro) {
       <div class="product-img">
         <img class="img-main" src="images/${COL_MAP[p.id] || p.imagen}" alt="${p.alt}" loading="lazy">
         <img class="img-hover${ROTATE_HOVER.has(p.id) ? ' rotate-cw' : ''}" src="images/${HOVER_MAP[p.id] || (p.id + '-2.jpg')}" alt="${p.alt}" loading="lazy">
+        <button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'${p.id}',name:'${p.nombre} ${p.color}',type:'${p.tipo}',image:'images/${COL_MAP[p.id] || p.imagen}'})">+ Agregar al carrito</button>
       </div>
       <div class="product-info">
         <div class="product-name">${p.nombre}</div>
