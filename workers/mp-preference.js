@@ -65,7 +65,7 @@ export default {
         id: item.id,
         title: `Flamingo Sports — ${item.name}`,
         description: 'Calcetines técnicos para tenis y pádel. Talla única 36–44 unisex.',
-        unit_price: item.price || 8990,
+        unit_price: item.price || 9990,
         quantity: item.qty || 1,
         currency_id: 'CLP',
         category_id: 'clothing_accessories',
@@ -116,9 +116,9 @@ export default {
       const REVIEW_URL = env.REVIEW_FORM_URL || 'https://www.flamingosports.cl';
       const primerNombre = shipping.nombre.split(' ')[0];
       const itemsHtml = items.map(i =>
-        `<tr><td style="padding:6px 0;font-size:13px;">${i.name} × ${i.qty}</td><td style="padding:6px 0;font-size:13px;text-align:right;">$${((i.price||8990)*i.qty).toLocaleString('es-CL')}</td></tr>`
+        `<tr><td style="padding:6px 0;font-size:13px;">${i.name} × ${i.qty}</td><td style="padding:6px 0;font-size:13px;text-align:right;">$${((i.price||9990)*i.qty).toLocaleString('es-CL')}</td></tr>`
       ).join('');
-      const total = items.reduce((s, i) => s + (i.price||8990) * i.qty, 0);
+      const total = items.reduce((s, i) => s + (i.price||9990) * i.qty, 0);
 
       // 1 — Aviso al vendedor
       fetch('https://api.brevo.com/v3/smtp/email', {

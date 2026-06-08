@@ -446,9 +446,9 @@ if (!prod) {
     "offers": {
       "@type": "Offer",
       "priceCurrency": "CLP",
-      "price": "8990",
+      "price": "9990",
       "availability": "https://schema.org/InStock",
-      "url": prod.comprar,
+      "url": `https://www.flamingosports.cl/producto.html?id=${id}`,
       "seller": {"@type": "Organization", "name": "Flamingo Sports"}
     }
   };
@@ -570,7 +570,7 @@ window.initMPCheckout = async function() {
           name: prodData ? `${prodData.nombre} ${prodData.color}` : 'Calcetines Flamingo Sports',
           type: prodData ? prodData.tipo : 'Calcetín',
           image: prodData ? prodData.fotos[0] : '',
-          price: 8990,
+          price: 9990,
           qty: 1,
         }]
       }),
