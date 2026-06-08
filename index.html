@@ -184,6 +184,9 @@ nav{
 .product-card:hover .product-img .img-main{opacity:0;}
 .product-card:hover .product-img .img-hover{opacity:1;}
 .img-hover.rotate-cw{transform:rotate(90deg);}
+.card-add-btn{position:absolute;bottom:0;left:0;right:0;z-index:3;background:rgba(27,45,74,.92);color:white;font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;padding:11px;cursor:pointer;opacity:0;transform:translateY(6px);transition:opacity .22s ease,transform .22s ease;}
+.product-card:hover .card-add-btn{opacity:1;transform:translateY(0);}
+.card-add-btn:hover{background:var(--coral);}
 .product-info{padding:16px 18px 20px;}
 .product-name{font-family:var(--r);font-size:20px;font-weight:900;letter-spacing:-0.5px;text-transform:uppercase;color:var(--navy);margin-bottom:4px;line-height:1;}
 .product-color{font-family:var(--r);font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:var(--coral);}
@@ -436,56 +439,56 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
 
   <div class="products-grid" style="margin-top:40px;">
     <a class="product-card" href="producto.html?id=tatio-turquesa">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-calipso.png" alt="Calcetín Tatio Turquesa — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/tatio-turquesa-2.jpg" alt="Tatio Turquesa" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-calipso.png" alt="Calcetín Tatio Turquesa — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/tatio-turquesa-2.jpg" alt="Tatio Turquesa" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'tatio-turquesa',name:'Tatio Calipso',type:'Calcetín largo',image:'images/col-calipso.png'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Tatio</div>
         <div class="product-color">Calipso</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-pink">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-pink.jpg" alt="Calcetín Artemia Pink — largo rosa para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/artemia-pink-3.jpg" alt="Artemia Pink" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-pink.jpg" alt="Calcetín Artemia Pink — largo rosa para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/artemia-pink-3.jpg" alt="Artemia Pink" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'artemia-pink',name:'Artemia Pink',type:'Calcetín largo',image:'images/col-pink.jpg'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Artemia</div>
         <div class="product-color">Pink</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=mamalluca-lila">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-lila.jpg" alt="Calcetín Mamalluca Lila — medio para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/mamalluca-lila-2.jpg" alt="Mamalluca Lila" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-lila.jpg" alt="Calcetín Mamalluca Lila — medio para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/mamalluca-lila-2.jpg" alt="Mamalluca Lila" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'mamalluca-lila',name:'Mamalluca Lila',type:'Calcetín medio',image:'images/col-lila.jpg'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Mamalluca</div>
         <div class="product-color">Lila</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=mamalluca-morado">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-morado.png" alt="Calcetín Mamalluca Morado — medio para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/mamalluca-morado-2.jpg" alt="Mamalluca Morado" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-morado.png" alt="Calcetín Mamalluca Morado — medio para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/mamalluca-morado-2.jpg" alt="Mamalluca Morado" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'mamalluca-morado',name:'Mamalluca Morado',type:'Calcetín medio',image:'images/col-morado.png'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Mamalluca</div>
         <div class="product-color">Morado</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-gris">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-gris.jpg" alt="Calcetín Artemia Gris — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/artemia-gris-3.jpg" alt="Artemia Gris" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-gris.jpg" alt="Calcetín Artemia Gris — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/artemia-gris-3.jpg" alt="Artemia Gris" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'artemia-gris',name:'Artemia Gris',type:'Calcetín largo',image:'images/col-gris.jpg'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Artemia</div>
         <div class="product-color">Gris</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=artemia-blanco">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-whiteblue.png" alt="Calcetín Artemia Blanco Celeste — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/artemia-blanco-2.jpg" alt="Artemia Blanco" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-whiteblue.png" alt="Calcetín Artemia Blanco Celeste — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover" src="images/artemia-blanco-2.jpg" alt="Artemia Blanco" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'artemia-blanco',name:'Artemia Blanco',type:'Calcetín largo',image:'images/col-whiteblue.png'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Artemia</div>
         <div class="product-color">White Blue</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=tamarugal-navy">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-navy2.png" alt="Calcetín Tamarugal Navy — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover rotate-cw" src="images/tamarugal-navy-2.jpg" alt="Tamarugal Navy" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-navy2.png" alt="Calcetín Tamarugal Navy — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover rotate-cw" src="images/tamarugal-navy-2.jpg" alt="Tamarugal Navy" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'tamarugal-navy',name:'Tamarugal Navy',type:'Calcetín largo',image:'images/col-navy2.png'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Tamarugal</div>
         <div class="product-color">Navy</div>
       </div>
     </a>
     <a class="product-card" href="producto.html?id=tamarugal-blanco">
-      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-blanco2.png" alt="Calcetín Tamarugal Blanco — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover rotate-cw" src="images/tamarugal-blanco-2.jpg" alt="Tamarugal Blanco" loading="lazy"></div>
+      <div class="product-img" style="background:#e8f4f8;"><img class="img-main" src="images/col-blanco2.png" alt="Calcetín Tamarugal Blanco — largo para tenis y pádel Flamingo Sports Chile" loading="lazy"><img class="img-hover rotate-cw" src="images/tamarugal-blanco-2.jpg" alt="Tamarugal Blanco" loading="lazy"><button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'tamarugal-blanco',name:'Tamarugal Blanco',type:'Calcetín largo',image:'images/col-blanco2.png'})">+ Agregar al carrito</button></div>
       <div class="product-info">
         <div class="product-name">Tamarugal</div>
         <div class="product-color">Blanco</div>
