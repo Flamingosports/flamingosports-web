@@ -1,0 +1,9 @@
+# Artefactos locales de wrangler
+.wrangler/
+workers/.wrangler/
+
+# Fotos en bruto (no las usa el sitio; viven en Contexto Marca)
+productos/
+
+# Documentos internos que no deben publicarse en GitHub Pages
+SEO_rescan_post_implementacion.md

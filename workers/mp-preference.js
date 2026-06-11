@@ -7,10 +7,11 @@
      IG_ACCESS_TOKEN    — Instagram Graph API long-lived token
 
    Rutas:
-     POST /            — crea preferencia de pago MP (NO envía emails)
-     POST /mp-webhook  — notificación de MP: con pago APROBADO envía los
-                         emails (aviso vendedor + confirmación + review +7d)
-     GET  /ig-feed     — proxy del feed de Instagram (token nunca al browser)
+     POST /                — crea preferencia de pago MP (NO envía emails)
+     POST /mp-webhook      — notificación de MP: con pago APROBADO envía los
+                             emails (aviso vendedor + confirmación + review +7d)
+     GET  /ig-feed         — proxy del feed de Instagram (token nunca al browser)
+     GET  /validate-coupon — valida un código de descuento (?code=X&pairs=N)
    ===================================================== */
 
 const ALLOWED_ORIGINS = [
@@ -18,6 +19,32 @@ const ALLOWED_ORIGINS = [
   'https://flamingosports.cl',
   'http://localhost:3000',
 ];
+
+// ── Cupones de descuento ──────────────────────────────
+// La única fuente de verdad: el browser solo muestra lo que este Worker valida.
+// type: 'percent' (value = % de dcto) | 'fixed' (value = $ CLP de dcto por orden)
+// minPairs: mínimo de pares en el carrito · validUntil: fecha inclusive, hora Chile
+const COUPONS = {
+  // Gancho de segunda compra — va en el email de confirmación de pedido
+  'VUELVE15': { type: 'percent', value: 15, minPairs: 1, validUntil: '2026-12-31', label: '15% de descuento' },
+  // Oferta email "2 pares × $17.990" (2×9.990 − 1.990 = 17.990 exacto)
+  'DOSPARES': { type: 'fixed', value: 1990, minPairs: 2, validUntil: '2026-06-28', label: '2º par con $1.990 de descuento' },
+};
+
+function validateCoupon(code, pairs) {
+  const key = String(code || '').trim().toUpperCase();
+  const c = COUPONS[key];
+  if (!c) return { valid: false, reason: 'Código no válido' };
+  if (new Date(`${c.validUntil}T23:59:59-04:00`) < new Date()) return { valid: false, reason: 'Este código ya venció' };
+  if ((pairs || 0) < (c.minPairs || 1)) return { valid: false, reason: `Este código requiere mínimo ${c.minPairs} pares` };
+  return { valid: true, code: key, type: c.type, value: c.value, label: c.label, minPairs: c.minPairs || 1 };
+}
+
+function computeDiscount(coupon, total) {
+  if (!coupon || !coupon.valid) return 0;
+  const d = coupon.type === 'percent' ? Math.round(total * coupon.value / 100) : coupon.value;
+  return Math.max(0, Math.min(d, total));
+}
 
 const WORKER_URL = 'https://mp-preference.flamingosport-cl.workers.dev';
 
@@ -61,6 +88,12 @@ export default {
       }
     }
 
+    // ── GET /validate-coupon — validar código de descuento ──────
+    if (request.method === 'GET' && url.pathname === '/validate-coupon') {
+      const pairs = parseInt(url.searchParams.get('pairs') || '0', 10) || 0;
+      return json(validateCoupon(url.searchParams.get('code'), pairs));
+    }
+
     // ── POST /mp-webhook — notificaciones de Mercado Pago ──────
     if (request.method === 'POST' && url.pathname === '/mp-webhook') {
       return handleWebhook(request, env, ctx, url);
@@ -73,20 +106,42 @@ export default {
     try { body = await request.json(); }
     catch { return json({ error: 'Body inválido' }, 400); }
 
-    const { items, shipping } = body;
+    const { items, shipping, coupon } = body;
     if (!items?.length) return json({ error: 'Carrito vacío' }, 400);
 
+    // Cupón: se revalida acá (el front solo muestra; el Worker decide)
+    const pairsCount = items.reduce((s, i) => s + (i.qty || 1), 0);
+    const baseTotal = items.reduce((s, i) => s + (i.price || 9990) * (i.qty || 1), 0);
+    const cup = coupon ? validateCoupon(coupon, pairsCount) : null;
+    const discount = computeDiscount(cup, baseTotal);
+
+    // MP no acepta items con precio negativo: con descuento, la orden va como
+    // un único ítem por el total rebajado (el detalle viaja en metadata y se
+    // itemiza en los emails)
+    const mpItems = discount > 0
+      ? [{
+          id: 'pedido-flamingo',
+          title: `Flamingo Sports — ${pairsCount} ${pairsCount === 1 ? 'par' : 'pares'} (cód. ${cup.code})`,
+          description: items.map(i => `${i.name} x${i.qty || 1}`).join(', ').slice(0, 250),
+          unit_price: baseTotal - discount,
+          quantity: 1,
+          currency_id: 'CLP',
+          category_id: 'clothing_accessories',
+          picture_url: 'https://www.flamingosports.cl/images/logo-negro.png',
+        }]
+      : items.map(item => ({
+          id: item.id,
+          title: `Flamingo Sports — ${item.name}`,
+          description: 'Calcetines técnicos para tenis y pádel. Talla única 36–44 unisex.',
+          unit_price: item.price || 9990,
+          quantity: item.qty || 1,
+          currency_id: 'CLP',
+          category_id: 'clothing_accessories',
+          picture_url: item.image ? `https://www.flamingosports.cl/${item.image}` : 'https://www.flamingosports.cl/images/logo-negro.png',
+        }));
+
     const preference = {
-      items: items.map(item => ({
-        id: item.id,
-        title: `Flamingo Sports — ${item.name}`,
-        description: 'Calcetines técnicos para tenis y pádel. Talla única 36–44 unisex.',
-        unit_price: item.price || 9990,
-        quantity: item.qty || 1,
-        currency_id: 'CLP',
-        category_id: 'clothing_accessories',
-        picture_url: item.image ? `https://www.flamingosports.cl/${item.image}` : 'https://www.flamingosports.cl/images/logo-negro.png',
-      })),
+      items: mpItems,
       payer: shipping ? {
         name: shipping.nombre?.split(' ')[0] || '',
         surname: shipping.nombre?.split(' ').slice(1).join(' ') || '',
@@ -108,7 +163,11 @@ export default {
       } : undefined,
       // metadata viaja al objeto payment → el webhook recupera de aquí los
       // datos de envío para los emails (solo se envían con pago aprobado)
-      metadata: { shipping: shipping || null, cart_items: items },
+      metadata: {
+        shipping: shipping || null,
+        cart_items: items,
+        coupon: discount > 0 ? { code: cup.code, discount } : null,
+      },
       external_reference: shipping?.email || '',
       notification_url: `${WORKER_URL}/mp-webhook`,
       back_urls: {
@@ -141,7 +200,11 @@ async function handleWebhook(request, env, ctx, url) {
   let notif = {};
   try { notif = await request.json(); } catch {}
   const paymentId = url.searchParams.get('data.id') || notif?.data?.id || url.searchParams.get('id');
-  const type = url.searchParams.get('type') || notif?.type || notif?.action || '';
+  // MP notifica en dos formatos: webhook nuevo (?type=payment&data.id=N) e
+  // IPN clásico (?topic=payment&id=N) — aceptar ambos
+  const type = url.searchParams.get('type') || url.searchParams.get('topic') || notif?.type || notif?.action || '';
+
+  console.log('mp-webhook recibido:', JSON.stringify({ type, paymentId, query: url.search.slice(0, 200) }));
 
   if (!paymentId || !String(type).includes('payment')) {
     return new Response('ignored', { status: 200 });
@@ -155,8 +218,9 @@ async function processPayment(paymentId, env) {
   const res = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
     headers: { 'Authorization': `Bearer ${env.MP_ACCESS_TOKEN}` },
   });
-  if (!res.ok) return;
+  if (!res.ok) { console.log(`pago ${paymentId}: consulta MP falló ${res.status}`); return; }
   const payment = await res.json();
+  console.log(`pago ${paymentId}: status=${payment.status}`);
   if (payment.status !== 'approved') return;
 
   // Dedupe best-effort: MP reintenta notificaciones del mismo pago
@@ -177,9 +241,13 @@ async function processPayment(paymentId, env) {
   if (!env.BREVO_API_KEY) return;
   const brevoHeaders = { 'api-key': env.BREVO_API_KEY, 'Content-Type': 'application/json' };
   const REVIEW_URL = env.REVIEW_FORM_URL || 'https://www.flamingosports.cl';
+  const cupMeta = meta.coupon || null;
+  const discountRow = cupMeta
+    ? `<tr><td style="padding:6px 0;font-size:13px;color:#1F9D55;">Descuento (${cupMeta.code})</td><td style="padding:6px 0;font-size:13px;text-align:right;color:#1F9D55;">−$${Number(cupMeta.discount).toLocaleString('es-CL')}</td></tr>`
+    : '';
   const itemsHtml = items.map(i =>
     `<tr><td style="padding:6px 0;font-size:13px;">${i.name} × ${i.qty}</td><td style="padding:6px 0;font-size:13px;text-align:right;">$${((i.price || 9990) * (i.qty || 1)).toLocaleString('es-CL')}</td></tr>`
-  ).join('');
+  ).join('') + discountRow;
   const direccionHtml = shipping
     ? `${shipping.direccion}${shipping.depto ? ', ' + shipping.depto : ''}, ${shipping.ciudad}, ${shipping.region}`
     : '(ver datos en Mercado Pago)';
@@ -205,7 +273,7 @@ async function processPayment(paymentId, env) {
         sender: { name: 'Flamingo Sports', email: 'tioflamingo@flamingosports.cl' },
         to: [{ email: buyerEmail, name: buyerName }],
         subject: `Tu pedido está confirmado, ${primerNombre} 🦩`,
-        htmlContent: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#1a1a1a;"><p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:16px;">FLAMINGO SPORTS</p><h2 style="font-size:24px;font-weight:900;color:#1B2D4A;margin:0 0 20px;">Recibimos tu pago, ${primerNombre}.</h2><p style="margin:0 0 16px;line-height:1.7;">Tu pedido está confirmado. En las próximas <strong>48 horas hábiles</strong> lo despachamos por Bluexpress y te llegará el número de seguimiento.</p><table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eee;border-bottom:1px solid #eee;margin:24px 0;padding:16px 0;">${itemsHtml}<tr><td style="padding:10px 0 0;font-weight:700;">Total pagado</td><td style="padding:10px 0 0;text-align:right;font-weight:700;color:#F0907C;">$${total.toLocaleString('es-CL')}</td></tr></table><p style="margin:0 0 16px;line-height:1.7;"><strong>Dirección de entrega:</strong><br>${direccionHtml}</p><p style="margin:0 0 32px;line-height:1.7;">¿Tienes alguna duda? Escríbenos por <a href="https://wa.me/56992269522" style="color:#1B2D4A;font-weight:700;">WhatsApp</a> — respondemos rápido.</p><p style="margin:0 0 4px;">Un abrazo,</p><p style="margin:0 0 32px;font-weight:700;">Nico, Kimu y Pollo<br><span style="font-size:12px;color:#999;font-weight:400;letter-spacing:1px;text-transform:uppercase;">Los Tíos Flamingo</span></p><p style="font-size:11px;color:#bbb;border-top:1px solid #eee;padding-top:16px;">Flamingo Sports · Santiago, Chile · <a href="https://www.flamingosports.cl" style="color:#bbb;">flamingosports.cl</a></p></div>`,
+        htmlContent: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#1a1a1a;"><p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:16px;">FLAMINGO SPORTS</p><h2 style="font-size:24px;font-weight:900;color:#1B2D4A;margin:0 0 20px;">Recibimos tu pago, ${primerNombre}.</h2><p style="margin:0 0 16px;line-height:1.7;">Tu pedido está confirmado. En las próximas <strong>48 horas hábiles</strong> lo despachamos por Bluexpress y te llegará el número de seguimiento.</p><table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eee;border-bottom:1px solid #eee;margin:24px 0;padding:16px 0;">${itemsHtml}<tr><td style="padding:10px 0 0;font-weight:700;">Total pagado</td><td style="padding:10px 0 0;text-align:right;font-weight:700;color:#F0907C;">$${total.toLocaleString('es-CL')}</td></tr></table><p style="margin:0 0 16px;line-height:1.7;"><strong>Dirección de entrega:</strong><br>${direccionHtml}</p><div style="background:#FDF1EE;border-left:4px solid #F0907C;padding:14px 18px;margin:0 0 24px;"><p style="margin:0;line-height:1.6;font-size:14px;">🦩 <strong>Regalo de los tíos:</strong> usa el código <strong style="letter-spacing:1px;">VUELVE15</strong> en tu próxima compra y te descontamos el 15%.</p></div><p style="margin:0 0 32px;line-height:1.7;">¿Tienes alguna duda? Escríbenos por <a href="https://wa.me/56992269522" style="color:#1B2D4A;font-weight:700;">WhatsApp</a> — respondemos rápido.</p><p style="margin:0 0 4px;">Un abrazo,</p><p style="margin:0 0 32px;font-weight:700;">Nico, Kimu y Pollo<br><span style="font-size:12px;color:#999;font-weight:400;letter-spacing:1px;text-transform:uppercase;">Los Tíos Flamingo</span></p><p style="font-size:11px;color:#bbb;border-top:1px solid #eee;padding-top:16px;">Flamingo Sports · Santiago, Chile · <a href="https://www.flamingosports.cl" style="color:#bbb;">flamingosports.cl</a></p></div>`,
       }),
     }));
 
@@ -223,5 +291,8 @@ async function processPayment(paymentId, env) {
     }));
   }
 
-  await Promise.allSettled(sends);
+  const results = await Promise.allSettled(sends);
+  console.log(`pago ${paymentId}: emails enviados → ` + results.map(r =>
+    r.status === 'fulfilled' ? `HTTP ${r.value.status}` : `ERROR ${r.reason?.message}`
+  ).join(' · '));
 }

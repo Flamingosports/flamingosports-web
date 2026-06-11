@@ -6,6 +6,13 @@
 const WORKER_URL = 'https://mp-preference.flamingosport-cl.workers.dev';
 const PRICE      = 9990;
 const CART_KEY   = 'flamingo_cart';
+const COUPON_KEY = 'flamingo_coupon';
+
+// El cupón guardado ya viene validado por el Worker; igual se revalida al pagar
+function getCoupon() {
+  try { return JSON.parse(sessionStorage.getItem(COUPON_KEY) || 'null'); }
+  catch { return null; }
+}
 
 // ── Estado del carrito ────────────────────────────────
 const Cart = {
@@ -40,7 +47,15 @@ const Cart = {
   },
   count()  { return Cart.get().reduce((s, i) => s + i.qty, 0); },
   total()  { return Cart.get().reduce((s, i) => s + i.price * i.qty, 0); },
-  clear()  { localStorage.removeItem(CART_KEY); Cart.refresh(); },
+  discount() {
+    const c = getCoupon();
+    if (!c || !c.valid || Cart.count() < (c.minPairs || 1)) return 0;
+    const total = Cart.total();
+    const d = c.type === 'percent' ? Math.round(total * c.value / 100) : c.value;
+    return Math.max(0, Math.min(d, total));
+  },
+  totalToPay() { return Cart.total() - Cart.discount(); },
+  clear()  { localStorage.removeItem(CART_KEY); sessionStorage.removeItem(COUPON_KEY); Cart.refresh(); },
   open()   {
     showCartStep('items');
     document.getElementById('cart-drawer')?.classList.add('open');
@@ -86,9 +101,64 @@ const Cart = {
           <button class="remove-btn" onclick="Cart.remove('${item.id}')">✕</button>
         </div>
       </div>`).join('');
-    document.getElementById('cart-total-amount').textContent = '$' + Cart.total().toLocaleString('es-CL');
+    // Totales (con descuento si hay cupón aplicado)
+    const coupon = getCoupon();
+    const disc = Cart.discount();
+    const block = document.getElementById('cart-discount-block');
+    const msg = document.getElementById('coupon-msg');
+    if (block) {
+      if (disc > 0 && coupon) {
+        block.style.display = 'block';
+        document.getElementById('cart-subtotal-amount').textContent = '$' + Cart.total().toLocaleString('es-CL');
+        document.getElementById('cart-discount-label').textContent = `${coupon.code} · ${coupon.label}`;
+        document.getElementById('cart-discount-amount').textContent = '−$' + disc.toLocaleString('es-CL');
+      } else {
+        block.style.display = 'none';
+        // cupón guardado pero ya no aplica (p. ej. bajó de los pares mínimos)
+        if (coupon && msg && Cart.count() > 0 && Cart.count() < (coupon.minPairs || 1)) {
+          msg.textContent = `El código ${coupon.code} requiere mínimo ${coupon.minPairs} pares`;
+          msg.className = 'coupon-msg error';
+        }
+      }
+    }
+    document.getElementById('cart-total-amount').textContent = '$' + Cart.totalToPay().toLocaleString('es-CL');
   },
 };
+
+// ── Cupones ───────────────────────────────────────────
+async function applyCoupon() {
+  const input = document.getElementById('coupon-input');
+  const msg = document.getElementById('coupon-msg');
+  const code = (input.value || '').trim();
+  if (!code) return;
+  msg.textContent = 'Verificando…';
+  msg.className = 'coupon-msg';
+  try {
+    const res = await fetch(`${WORKER_URL}/validate-coupon?code=${encodeURIComponent(code)}&pairs=${Cart.count()}`);
+    const data = await res.json();
+    if (data.valid) {
+      sessionStorage.setItem(COUPON_KEY, JSON.stringify(data));
+      msg.textContent = `✓ Código ${data.code} aplicado`;
+      msg.className = 'coupon-msg ok';
+      input.value = '';
+    } else {
+      sessionStorage.removeItem(COUPON_KEY);
+      msg.textContent = data.reason || 'Código no válido';
+      msg.className = 'coupon-msg error';
+    }
+  } catch {
+    msg.textContent = 'No pudimos verificar el código. Intenta de nuevo.';
+    msg.className = 'coupon-msg error';
+  }
+  Cart.refresh();
+}
+
+function removeCoupon() {
+  sessionStorage.removeItem(COUPON_KEY);
+  const msg = document.getElementById('coupon-msg');
+  if (msg) { msg.textContent = ''; msg.className = 'coupon-msg'; }
+  Cart.refresh();
+}
 
 // ── Pasos del drawer ──────────────────────────────────
 function showCartStep(step) {
@@ -100,11 +170,11 @@ function showCartStep(step) {
 function goToShipping() {
   if (!Cart.get().length) return;
   if (typeof gtag === 'function') gtag('event', 'begin_checkout', {
-    currency: 'CLP', value: Cart.total(),
+    currency: 'CLP', value: Cart.totalToPay(),
     items: Cart.get().map(i => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.qty })),
   });
   if (typeof fbq === 'function') fbq('track', 'InitiateCheckout', {
-    currency: 'CLP', value: Cart.total(), num_items: Cart.count(),
+    currency: 'CLP', value: Cart.totalToPay(), num_items: Cart.count(),
     content_ids: Cart.get().map(i => i.id), content_type: 'product',
   });
   showCartStep('shipping');
@@ -139,14 +209,14 @@ async function submitShipping(e) {
     const res = await fetch(WORKER_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ items: Cart.get(), shipping }),
+      body: JSON.stringify({ items: Cart.get(), shipping, coupon: getCoupon()?.code || null }),
     });
     const data = await res.json();
     if (!data.init_point) throw new Error('Sin init_point');
     // El carrito NO se vacía aquí: si el pago falla o se abandona, el cliente
     // vuelve con su carrito intacto. Se vacía en gracias.html con pago aprobado.
     sessionStorage.setItem('flamingo_order', JSON.stringify({
-      pref: data.preference_id, total: Cart.total(), items: Cart.get(),
+      pref: data.preference_id, total: Cart.totalToPay(), items: Cart.get(),
     }));
     window.location.href = data.init_point;
   } catch (err) {
@@ -193,6 +263,19 @@ function injectCart() {
     .remove-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:12px;padding:4px;margin-left:4px;transition:color .15s;}
     .remove-btn:hover{color:#e74c3c;}
     .cart-footer{padding:20px 24px;border-top:1px solid #eee;background:#fff;flex-shrink:0;}
+    .coupon-row{display:flex;gap:8px;margin-bottom:6px;}
+    .coupon-row input{flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:12px;color:#1B2D4A;outline:none;text-transform:uppercase;transition:border-color .15s;box-sizing:border-box;}
+    .coupon-row input:focus{border-color:#1B2D4A;}
+    .coupon-row input::placeholder{text-transform:none;color:#bbb;}
+    .coupon-row button{padding:10px 18px;background:#fff;color:#1B2D4A;border:1px solid #1B2D4A;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+    .coupon-row button:hover{background:#1B2D4A;color:#fff;}
+    .coupon-msg{font-family:'Causten',Arial,sans-serif;font-size:10px;margin:0 0 10px;min-height:13px;color:#999;letter-spacing:.5px;}
+    .coupon-msg.ok{color:#1F9D55;font-weight:700;}
+    .coupon-msg.error{color:#e74c3c;}
+    .cart-sub-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:11px;color:#666;margin-bottom:6px;}
+    .cart-sub-line.discount{color:#1F9D55;font-weight:700;}
+    .coupon-remove{background:none;border:none;color:#ccc;cursor:pointer;font-size:10px;margin-left:8px;padding:2px;vertical-align:middle;}
+    .coupon-remove:hover{color:#e74c3c;}
     .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
     .cart-total-label{font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;}
     .cart-total-price{font-family:'Causten',Arial,sans-serif;font-size:20px;font-weight:900;color:#1B2D4A;}
@@ -241,6 +324,22 @@ function injectCart() {
       <div id="cart-step-items" style="display:flex;">
         <div id="cart-items" class="cart-items"></div>
         <div id="cart-footer" class="cart-footer" style="display:none;">
+          <div class="coupon-row">
+            <input type="text" id="coupon-input" placeholder="Código de descuento" autocomplete="off"
+                   onkeydown="if(event.key==='Enter'){event.preventDefault();applyCoupon();}">
+            <button type="button" onclick="applyCoupon()">Aplicar</button>
+          </div>
+          <p id="coupon-msg" class="coupon-msg"></p>
+          <div id="cart-discount-block" style="display:none;">
+            <div class="cart-sub-line">
+              <span>Subtotal</span>
+              <span id="cart-subtotal-amount"></span>
+            </div>
+            <div class="cart-sub-line discount">
+              <span id="cart-discount-label"></span>
+              <span><span id="cart-discount-amount"></span><button class="coupon-remove" onclick="removeCoupon()" title="Quitar código">✕</button></span>
+            </div>
+          </div>
           <div class="cart-total-row">
             <span class="cart-total-label">Total</span>
             <span class="cart-total-price" id="cart-total-amount">$0</span>
@@ -324,5 +423,7 @@ window.Cart          = Cart;
 window.goToShipping  = goToShipping;
 window.backToCart    = backToCart;
 window.submitShipping = submitShipping;
+window.applyCoupon   = applyCoupon;
+window.removeCoupon  = removeCoupon;
 
 document.addEventListener('DOMContentLoaded', () => { injectCart(); Cart.refresh(); });

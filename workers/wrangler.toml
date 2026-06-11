@@ -1,0 +1,14 @@
+name = "mp-preference"
+main = "mp-preference.js"
+compatibility_date = "2026-06-01"
+
+# Logs persistentes en Cloudflare (dashboard → Workers → mp-preference → Logs)
+[observability]
+enabled = true
+
+# Secrets (configurados en Cloudflare, NO en este archivo):
+#   MP_ACCESS_TOKEN  — Mercado Pago Access Token producción
+#   BREVO_API_KEY    — API key de Brevo
+#   IG_ACCESS_TOKEN  — Instagram Graph API long-lived token
+#   REVIEW_FORM_URL  — URL del Google Form de reviews (opcional)
+# Para actualizar un secret: npx wrangler secret put NOMBRE
