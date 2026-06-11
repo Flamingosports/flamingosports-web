@@ -21,6 +21,14 @@ const Cart = {
     else          items.push({ ...product, qty: 1, price: PRICE });
     Cart.save(items);
     Cart.open();
+    if (typeof gtag === 'function') gtag('event', 'add_to_cart', {
+      currency: 'CLP', value: PRICE,
+      items: [{ item_id: product.id, item_name: product.name, price: PRICE, quantity: 1 }],
+    });
+    if (typeof fbq === 'function') fbq('track', 'AddToCart', {
+      content_ids: [product.id], content_name: product.name,
+      content_type: 'product', currency: 'CLP', value: PRICE,
+    });
   },
   remove(id)        { Cart.save(Cart.get().filter(i => i.id !== id)); },
   setQty(id, qty)   {
@@ -91,6 +99,14 @@ function showCartStep(step) {
 // ── Formulario de envío ───────────────────────────────
 function goToShipping() {
   if (!Cart.get().length) return;
+  if (typeof gtag === 'function') gtag('event', 'begin_checkout', {
+    currency: 'CLP', value: Cart.total(),
+    items: Cart.get().map(i => ({ item_id: i.id, item_name: i.name, price: i.price, quantity: i.qty })),
+  });
+  if (typeof fbq === 'function') fbq('track', 'InitiateCheckout', {
+    currency: 'CLP', value: Cart.total(), num_items: Cart.count(),
+    content_ids: Cart.get().map(i => i.id), content_type: 'product',
+  });
   showCartStep('shipping');
   document.getElementById('cart-header-title').textContent = 'Datos de envío';
 }
@@ -127,7 +143,11 @@ async function submitShipping(e) {
     });
     const data = await res.json();
     if (!data.init_point) throw new Error('Sin init_point');
-    Cart.clear();
+    // El carrito NO se vacía aquí: si el pago falla o se abandona, el cliente
+    // vuelve con su carrito intacto. Se vacía en gracias.html con pago aprobado.
+    sessionStorage.setItem('flamingo_order', JSON.stringify({
+      pref: data.preference_id, total: Cart.total(), items: Cart.get(),
+    }));
     window.location.href = data.init_point;
   } catch (err) {
     console.error('Checkout error:', err);
