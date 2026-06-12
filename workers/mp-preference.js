@@ -28,7 +28,9 @@ const COUPONS = {
   // Gancho de segunda compra — va en el email de confirmación de pedido
   'VUELVE15': { type: 'percent', value: 15, minPairs: 1, validUntil: '2026-12-31', label: '15% de descuento' },
   // Oferta email "2 pares × $17.990" (2×9.990 − 1.990 = 17.990 exacto)
-  'DOSPARES': { type: 'fixed', value: 1990, minPairs: 2, validUntil: '2026-06-28', label: '2º par con $1.990 de descuento' },
+  // Vence 5 jul: cubre la tanda Fase 2 (deadline comunicado 28 jun) y la
+  // tanda Fase 3 (deadline comunicado 5 jul)
+  'DOSPARES': { type: 'fixed', value: 1990, minPairs: 2, validUntil: '2026-07-05', label: '2º par con $1.990 de descuento' },
 };
 
 function validateCoupon(code, pairs) {
