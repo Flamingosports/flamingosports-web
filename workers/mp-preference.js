@@ -25,21 +25,47 @@ const ALLOWED_ORIGINS = [
 // type: 'percent' (value = % de dcto) | 'fixed' (value = $ CLP de dcto por orden)
 // minPairs: mínimo de pares en el carrito · validUntil: fecha inclusive, hora Chile
 const COUPONS = {
-  // Gancho de segunda compra — va en el email de confirmación de pedido
-  'VUELVE20': { type: 'percent', value: 20, minPairs: 1, validUntil: '2026-12-31', label: '20% de descuento' },
   // Oferta email "2 pares × $17.990" (2×9.990 − 1.990 = 17.990 exacto)
   // Vence 5 jul: cubre la tanda Fase 2 (deadline comunicado 28 jun) y la
   // tanda Fase 3 (deadline comunicado 5 jul)
   'DOSPARES': { type: 'fixed', value: 1990, minPairs: 2, validUntil: '2026-07-05', label: '2º par con $1.990 de descuento' },
 };
 
-function validateCoupon(code, pairs) {
+// Códigos personales post-compra: VUELVE20-XXXX (20%, un solo uso, sin
+// caducidad). Se generan en el webhook con el pago aprobado, viven en KV
+// (coupon:CODIGO → {email, created, used}) y se marcan usados al canjearse.
+const VUELVE20_PREFIX = 'VUELVE20-';
+
+async function validateCoupon(code, pairs, env) {
   const key = String(code || '').trim().toUpperCase();
+  if (!key) return { valid: false, reason: 'Código no válido' };
+
+  // 1 — códigos de campaña (estáticos, multiuso)
   const c = COUPONS[key];
-  if (!c) return { valid: false, reason: 'Código no válido' };
-  if (new Date(`${c.validUntil}T23:59:59-04:00`) < new Date()) return { valid: false, reason: 'Este código ya venció' };
-  if ((pairs || 0) < (c.minPairs || 1)) return { valid: false, reason: `Este código requiere mínimo ${c.minPairs} pares` };
-  return { valid: true, code: key, type: c.type, value: c.value, label: c.label, minPairs: c.minPairs || 1 };
+  if (c) {
+    if (new Date(`${c.validUntil}T23:59:59-04:00`) < new Date()) return { valid: false, reason: 'Este código ya venció' };
+    if ((pairs || 0) < (c.minPairs || 1)) return { valid: false, reason: `Este código requiere mínimo ${c.minPairs} pares` };
+    return { valid: true, code: key, type: c.type, value: c.value, label: c.label, minPairs: c.minPairs || 1 };
+  }
+
+  // 2 — códigos personales VUELVE20-XXXX (un solo uso, sin vencimiento)
+  if (key.startsWith(VUELVE20_PREFIX) && env?.COUPON_KV) {
+    const raw = await env.COUPON_KV.get(`coupon:${key}`);
+    if (!raw) return { valid: false, reason: 'Código no válido' };
+    let data;
+    try { data = JSON.parse(raw); } catch { return { valid: false, reason: 'Código no válido' }; }
+    if (data.used) return { valid: false, reason: 'Este código ya fue usado' };
+    return { valid: true, code: key, type: 'percent', value: 20, label: '20% de descuento', minPairs: 1 };
+  }
+
+  return { valid: false, reason: 'Código no válido' };
+}
+
+function randomCode(len = 4) {
+  // sin caracteres ambiguos (I, L, O, 0, 1)
+  const alphabet = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+  const bytes = crypto.getRandomValues(new Uint8Array(len));
+  return Array.from(bytes, b => alphabet[b % alphabet.length]).join('');
 }
 
 function computeDiscount(coupon, total) {
@@ -93,7 +119,7 @@ export default {
     // ── GET /validate-coupon — validar código de descuento ──────
     if (request.method === 'GET' && url.pathname === '/validate-coupon') {
       const pairs = parseInt(url.searchParams.get('pairs') || '0', 10) || 0;
-      return json(validateCoupon(url.searchParams.get('code'), pairs));
+      return json(await validateCoupon(url.searchParams.get('code'), pairs, env));
     }
 
     // ── POST /mp-webhook — notificaciones de Mercado Pago ──────
@@ -114,7 +140,7 @@ export default {
     // Cupón: se revalida acá (el front solo muestra; el Worker decide)
     const pairsCount = items.reduce((s, i) => s + (i.qty || 1), 0);
     const baseTotal = items.reduce((s, i) => s + (i.price || 9990) * (i.qty || 1), 0);
-    const cup = coupon ? validateCoupon(coupon, pairsCount) : null;
+    const cup = coupon ? await validateCoupon(coupon, pairsCount, env) : null;
     const discount = computeDiscount(cup, baseTotal);
 
     // MP no acepta items con precio negativo: con descuento, la orden va como
@@ -247,6 +273,38 @@ async function processPayment(paymentId, env) {
   const discountRow = cupMeta
     ? `<tr><td style="padding:6px 0;font-size:13px;color:#1F9D55;">Descuento (${cupMeta.code})</td><td style="padding:6px 0;font-size:13px;text-align:right;color:#1F9D55;">−$${Number(cupMeta.discount).toLocaleString('es-CL')}</td></tr>`
     : '';
+
+  // Si el pago usó un código personal VUELVE20-XXXX → marcarlo como usado
+  if (cupMeta && String(cupMeta.code).startsWith('VUELVE20-') && env.COUPON_KV) {
+    const kvKey = `coupon:${cupMeta.code}`;
+    const raw = await env.COUPON_KV.get(kvKey);
+    if (raw) {
+      const data = JSON.parse(raw);
+      data.used = true;
+      data.usedAt = new Date().toISOString();
+      data.usedPaymentId = paymentId;
+      await env.COUPON_KV.put(kvKey, JSON.stringify(data));
+      console.log(`código ${cupMeta.code} marcado como USADO (pago ${paymentId})`);
+    }
+  }
+
+  // Generar el código personal de segunda compra para ESTE comprador
+  // (20%, un solo uso, sin caducidad) — va en su email de confirmación
+  let codigoPersonal = '';
+  if (env.COUPON_KV) {
+    for (let intento = 0; intento < 5 && !codigoPersonal; intento++) {
+      const candidato = `VUELVE20-${randomCode(4)}`;
+      if (!(await env.COUPON_KV.get(`coupon:${candidato}`))) {
+        await env.COUPON_KV.put(`coupon:${candidato}`, JSON.stringify({
+          email: payment.metadata?.shipping?.email || payment.payer?.email || '',
+          created: new Date().toISOString(),
+          fromPaymentId: paymentId,
+          used: false,
+        }));
+        codigoPersonal = candidato;
+      }
+    }
+  }
   const itemsHtml = items.map(i =>
     `<tr><td style="padding:6px 0;font-size:13px;">${i.name} × ${i.qty}</td><td style="padding:6px 0;font-size:13px;text-align:right;">$${((i.price || 9990) * (i.qty || 1)).toLocaleString('es-CL')}</td></tr>`
   ).join('') + discountRow;
@@ -275,7 +333,7 @@ async function processPayment(paymentId, env) {
         sender: { name: 'Flamingo Sports', email: 'tioflamingo@flamingosports.cl' },
         to: [{ email: buyerEmail, name: buyerName }],
         subject: `Tu pedido está confirmado, ${primerNombre} 🦩`,
-        htmlContent: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#1a1a1a;"><p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:16px;">FLAMINGO SPORTS</p><h2 style="font-size:24px;font-weight:900;color:#1B2D4A;margin:0 0 20px;">Recibimos tu pago, ${primerNombre}.</h2><p style="margin:0 0 16px;line-height:1.7;">Tu pedido está confirmado. En las próximas <strong>48 horas hábiles</strong> lo despachamos por Bluexpress y te llegará el número de seguimiento.</p><table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eee;border-bottom:1px solid #eee;margin:24px 0;padding:16px 0;">${itemsHtml}<tr><td style="padding:10px 0 0;font-weight:700;">Total pagado</td><td style="padding:10px 0 0;text-align:right;font-weight:700;color:#F0907C;">$${total.toLocaleString('es-CL')}</td></tr></table><p style="margin:0 0 16px;line-height:1.7;"><strong>Dirección de entrega:</strong><br>${direccionHtml}</p><div style="background:#FDF1EE;border-left:4px solid #F0907C;padding:14px 18px;margin:0 0 24px;"><p style="margin:0;line-height:1.6;font-size:14px;">🦩 <strong>Regalo de los tíos:</strong> usa el código <strong style="letter-spacing:1px;">VUELVE20</strong> en tu próxima compra y te descontamos el 20%.</p></div><p style="margin:0 0 32px;line-height:1.7;">¿Tienes alguna duda? Escríbenos por <a href="https://wa.me/56992269522" style="color:#1B2D4A;font-weight:700;">WhatsApp</a> — respondemos rápido.</p><p style="margin:0 0 4px;">Un abrazo,</p><p style="margin:0 0 32px;font-weight:700;">Nico, Kimu y Pollo<br><span style="font-size:12px;color:#999;font-weight:400;letter-spacing:1px;text-transform:uppercase;">Los Tíos Flamingo</span></p><p style="font-size:11px;color:#bbb;border-top:1px solid #eee;padding-top:16px;">Flamingo Sports · Santiago, Chile · <a href="https://www.flamingosports.cl" style="color:#bbb;">flamingosports.cl</a></p></div>`,
+        htmlContent: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#1a1a1a;"><p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:16px;">FLAMINGO SPORTS</p><h2 style="font-size:24px;font-weight:900;color:#1B2D4A;margin:0 0 20px;">Recibimos tu pago, ${primerNombre}.</h2><p style="margin:0 0 16px;line-height:1.7;">Tu pedido está confirmado. En las próximas <strong>48 horas hábiles</strong> lo despachamos por Bluexpress y te llegará el número de seguimiento.</p><table width="100%" cellpadding="0" cellspacing="0" style="border-top:1px solid #eee;border-bottom:1px solid #eee;margin:24px 0;padding:16px 0;">${itemsHtml}<tr><td style="padding:10px 0 0;font-weight:700;">Total pagado</td><td style="padding:10px 0 0;text-align:right;font-weight:700;color:#F0907C;">$${total.toLocaleString('es-CL')}</td></tr></table><p style="margin:0 0 16px;line-height:1.7;"><strong>Dirección de entrega:</strong><br>${direccionHtml}</p>${codigoPersonal ? `<div style="background:#FDF1EE;border-left:4px solid #F0907C;padding:14px 18px;margin:0 0 24px;"><p style="margin:0;line-height:1.6;font-size:14px;">🦩 <strong>Regalo de los tíos:</strong> tu código personal <strong style="letter-spacing:1px;">${codigoPersonal}</strong> te da un <strong>20% de descuento</strong> en tu próxima compra. No vence y es de un solo uso — guárdalo bien.</p></div>` : ''}<p style="margin:0 0 32px;line-height:1.7;">¿Tienes alguna duda? Escríbenos por <a href="https://wa.me/56992269522" style="color:#1B2D4A;font-weight:700;">WhatsApp</a> — respondemos rápido.</p><p style="margin:0 0 4px;">Un abrazo,</p><p style="margin:0 0 32px;font-weight:700;">Nico, Kimu y Pollo<br><span style="font-size:12px;color:#999;font-weight:400;letter-spacing:1px;text-transform:uppercase;">Los Tíos Flamingo</span></p><p style="font-size:11px;color:#bbb;border-top:1px solid #eee;padding-top:16px;">Flamingo Sports · Santiago, Chile · <a href="https://www.flamingosports.cl" style="color:#bbb;">flamingosports.cl</a></p></div>`,
       }),
     }));
 

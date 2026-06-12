@@ -6,6 +6,11 @@ compatibility_date = "2026-06-01"
 [observability]
 enabled = true
 
+# KV para códigos de descuento personales (VUELVE20-XXXX, un solo uso)
+[[kv_namespaces]]
+binding = "COUPON_KV"
+id = "74230d1e0713488ba3fb581690e0f3c8"
+
 # Secrets (configurados en Cloudflare, NO en este archivo):
 #   MP_ACCESS_TOKEN  — Mercado Pago Access Token producción
 #   BREVO_API_KEY    — API key de Brevo
