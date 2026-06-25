@@ -55,6 +55,17 @@ const Cart = {
     return Math.max(0, Math.min(d, total));
   },
   totalToPay() { return Cart.total() - Cart.discount(); },
+  // Costo de envío según pares y región. Devuelve null si aún no se conoce la
+  // región (y no aplica envío gratis). Debe coincidir con computeShipping() del
+  // Worker, que es la fuente de verdad de lo que cobra Mercado Pago.
+  shippingCost(region) {
+    const pairs = Cart.count();
+    if (pairs >= 4) return 0;            // envío gratis a todo Chile
+    if (!region) return null;           // región aún no seleccionada
+    const isRM = /metropolitana/i.test(region);
+    if (pairs === 3) return isRM ? 2000 : 3000;
+    return isRM ? 3000 : 4000;          // 1–2 pares
+  },
   clear()  { localStorage.removeItem(CART_KEY); sessionStorage.removeItem(COUPON_KEY); Cart.refresh(); },
   open()   {
     showCartStep('items');
@@ -122,6 +133,12 @@ const Cart = {
       }
     }
     document.getElementById('cart-total-amount').textContent = '$' + Cart.totalToPay().toLocaleString('es-CL');
+    const hint = document.getElementById('cart-ship-hint');
+    if (hint) {
+      hint.textContent = Cart.count() >= 4
+        ? '🦩 Envío gratis incluido'
+        : 'Envío se calcula según tu región · Gratis desde 4 pares';
+    }
   },
 };
 
@@ -179,6 +196,25 @@ function goToShipping() {
   });
   showCartStep('shipping');
   document.getElementById('cart-header-title').textContent = 'Datos de envío';
+  updateShippingSummary();
+}
+
+// Recalcula el resumen (subtotal + envío + total) en el paso de despacho.
+// Se dispara al entrar al paso y cada vez que cambia la región seleccionada.
+function updateShippingSummary() {
+  const form = document.getElementById('shipping-form');
+  if (!form) return;
+  const region   = form.region.value || '';
+  const subtotal = Cart.totalToPay();
+  const ship     = Cart.shippingCost(region); // null = región no elegida
+  const subEl  = document.getElementById('ship-subtotal');
+  const costEl = document.getElementById('ship-cost');
+  const totEl  = document.getElementById('ship-total');
+  if (subEl)  subEl.textContent = '$' + subtotal.toLocaleString('es-CL');
+  if (costEl) costEl.textContent = ship === null ? 'Según región'
+                                 : ship === 0    ? 'Gratis'
+                                 : '$' + ship.toLocaleString('es-CL');
+  if (totEl)  totEl.textContent = '$' + (subtotal + (ship || 0)).toLocaleString('es-CL');
 }
 
 function backToCart() {
@@ -216,7 +252,9 @@ async function submitShipping(e) {
     // El carrito NO se vacía aquí: si el pago falla o se abandona, el cliente
     // vuelve con su carrito intacto. Se vacía en gracias.html con pago aprobado.
     sessionStorage.setItem('flamingo_order', JSON.stringify({
-      pref: data.preference_id, total: Cart.totalToPay(), items: Cart.get(),
+      pref: data.preference_id,
+      total: Cart.totalToPay() + (Cart.shippingCost(shipping.region) || 0),
+      items: Cart.get(),
     }));
     window.location.href = data.init_point;
   } catch (err) {
@@ -282,6 +320,7 @@ function injectCart() {
     #cart-checkout-btn{display:block;width:100%;padding:16px;background:#F0907C;color:#fff;border:none;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
     #cart-checkout-btn:hover{background:#d97a68;}
     .cart-security{text-align:center;margin-top:10px;font-family:'Causten',Arial,sans-serif;font-size:9px;color:#bbb;letter-spacing:1px;}
+    .cart-ship-hint{font-family:'Causten',Arial,sans-serif;font-size:10px;color:#999;text-align:center;margin:-8px 0 14px;letter-spacing:.3px;}
 
     /* STEP SHIPPING */
     #cart-step-shipping{flex:1;display:none;flex-direction:column;overflow:hidden;}
@@ -295,6 +334,9 @@ function injectCart() {
     .form-row textarea{resize:none;height:72px;}
     .form-row-half{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
     .shipping-footer{padding:20px 24px;border-top:1px solid #eee;background:#fff;flex-shrink:0;}
+    .ship-summary{margin-bottom:16px;}
+    .ship-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:12px;color:#666;margin-bottom:8px;}
+    .ship-line.ship-total-line{font-size:15px;font-weight:900;color:#1B2D4A;border-top:1px solid #eee;padding-top:10px;margin-top:2px;}
     #shipping-submit-btn{display:block;width:100%;padding:16px;background:#F0907C;color:#fff;border:none;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
     #shipping-submit-btn:hover{background:#d97a68;}
     #shipping-submit-btn:disabled{background:#ccc;cursor:not-allowed;}
@@ -344,6 +386,7 @@ function injectCart() {
             <span class="cart-total-label">Total</span>
             <span class="cart-total-price" id="cart-total-amount">$0</span>
           </div>
+          <p id="cart-ship-hint" class="cart-ship-hint"></p>
           <button id="cart-checkout-btn" onclick="goToShipping()">Ingresar datos de envío →</button>
           <p class="cart-security">🔒 Pago seguro con Mercado Pago</p>
         </div>
@@ -368,7 +411,7 @@ function injectCart() {
             </div>
             <div class="form-row">
               <label>Región *</label>
-              <select name="region" required>
+              <select name="region" required onchange="updateShippingSummary()">
                 <option value="">Selecciona una región</option>
                 <option value="Región Metropolitana">Región Metropolitana</option>
                 <option value="Valparaíso">Valparaíso</option>
@@ -409,6 +452,11 @@ function injectCart() {
           </form>
         </div>
         <div class="shipping-footer">
+          <div class="ship-summary">
+            <div class="ship-line"><span>Subtotal</span><span id="ship-subtotal">$0</span></div>
+            <div class="ship-line"><span>Envío</span><span id="ship-cost">Según región</span></div>
+            <div class="ship-line ship-total-line"><span>Total</span><span id="ship-total">$0</span></div>
+          </div>
           <button id="shipping-submit-btn" onclick="document.getElementById('shipping-form').requestSubmit()">Confirmar y pagar →</button>
           <p class="shipping-security">🔒 Pago seguro con Mercado Pago · Despacho por Bluexpress</p>
         </div>
@@ -421,6 +469,7 @@ function injectCart() {
 
 window.Cart          = Cart;
 window.goToShipping  = goToShipping;
+window.updateShippingSummary = updateShippingSummary;
 window.backToCart    = backToCart;
 window.submitShipping = submitShipping;
 window.applyCoupon   = applyCoupon;

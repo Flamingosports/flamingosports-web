@@ -74,6 +74,24 @@ function computeDiscount(coupon, total) {
   return Math.max(0, Math.min(d, total));
 }
 
+// ── Costo de envío ────────────────────────────────────
+// Reglas (según pares en el carrito y región de despacho):
+//   1–2 pares → $3.000 Santiago / $4.000 regiones
+//     3 pares → $2.000 Santiago / $3.000 regiones
+//    4+ pares → gratis a todo Chile
+// "Santiago" = Región Metropolitana. Sin región (no debería ocurrir: el form
+// la exige) se cobra la tarifa de regiones para no subcobrar.
+function isSantiago(region) {
+  return /metropolitana/i.test(String(region || ''));
+}
+function computeShipping(region, pairs) {
+  const p = pairs || 0;
+  if (p >= 4) return 0;
+  const rm = isSantiago(region);
+  if (p === 3) return rm ? 2000 : 3000;
+  return rm ? 3000 : 4000; // 1–2 pares
+}
+
 const WORKER_URL = 'https://mp-preference.flamingosport-cl.workers.dev';
 
 export default {
@@ -142,6 +160,7 @@ export default {
     const baseTotal = items.reduce((s, i) => s + (i.price || 9990) * (i.qty || 1), 0);
     const cup = coupon ? await validateCoupon(coupon, pairsCount, env) : null;
     const discount = computeDiscount(cup, baseTotal);
+    const shippingCost = computeShipping(shipping?.region, pairsCount);
 
     // MP no acepta items con precio negativo: con descuento, la orden va como
     // un único ítem por el total rebajado (el detalle viaja en metadata y se
@@ -168,6 +187,20 @@ export default {
           picture_url: item.image ? `https://www.flamingosports.cl/${item.image}` : 'https://www.flamingosports.cl/images/logo-negro.png',
         }));
 
+    // Envío como ítem aparte para que MP lo cobre (gratis = no se agrega ítem)
+    if (shippingCost > 0) {
+      mpItems.push({
+        id: 'envio',
+        title: `Envío a domicilio — ${isSantiago(shipping?.region) ? 'Santiago' : 'Regiones'}`,
+        description: 'Despacho por Bluexpress',
+        unit_price: shippingCost,
+        quantity: 1,
+        currency_id: 'CLP',
+        category_id: 'shipping',
+        picture_url: 'https://www.flamingosports.cl/images/logo-negro.png',
+      });
+    }
+
     const preference = {
       items: mpItems,
       payer: shipping ? {
@@ -193,6 +226,7 @@ export default {
       // datos de envío para los emails (solo se envían con pago aprobado)
       metadata: {
         shipping: shipping || null,
+        shipping_cost: shippingCost,
         cart_items: items,
         coupon: discount > 0 ? { code: cup.code, discount } : null,
       },
@@ -305,9 +339,11 @@ async function processPayment(paymentId, env) {
       }
     }
   }
+  const shipCost = Number(meta.shipping_cost || 0);
+  const shippingRow = `<tr><td style="padding:6px 0;font-size:13px;">Envío</td><td style="padding:6px 0;font-size:13px;text-align:right;">${shipCost > 0 ? '$' + shipCost.toLocaleString('es-CL') : 'Gratis'}</td></tr>`;
   const itemsHtml = items.map(i =>
     `<tr><td style="padding:6px 0;font-size:13px;">${i.name} × ${i.qty}</td><td style="padding:6px 0;font-size:13px;text-align:right;">$${((i.price || 9990) * (i.qty || 1)).toLocaleString('es-CL')}</td></tr>`
-  ).join('') + discountRow;
+  ).join('') + discountRow + shippingRow;
   const direccionHtml = shipping
     ? `${shipping.direccion}${shipping.depto ? ', ' + shipping.depto : ''}, ${shipping.ciudad}, ${shipping.region}`
     : '(ver datos en Mercado Pago)';
