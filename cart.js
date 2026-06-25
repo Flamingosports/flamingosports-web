@@ -133,14 +133,32 @@ const Cart = {
       }
     }
     document.getElementById('cart-total-amount').textContent = '$' + Cart.totalToPay().toLocaleString('es-CL');
-    const hint = document.getElementById('cart-ship-hint');
-    if (hint) {
-      hint.textContent = Cart.count() >= 4
-        ? '🦩 Envío gratis incluido'
-        : 'Envío se calcula según tu región · Gratis desde 4 pares';
-    }
+    const rates = document.getElementById('cart-ship-rates');
+    if (rates) rates.innerHTML = shipRatesHTML(Cart.count());
   },
 };
+
+// Tabla de tarifas de envío. Resalta la fila que aplica según los pares en el
+// carrito, para transparentar el costo (Santiago vs regiones, por cantidad).
+function shipRatesHTML(pairs) {
+  const tiers = [
+    { label: '1–2 pares', active: pairs <= 2,            rm: '$3.000', reg: '$4.000' },
+    { label: '3 pares',   active: pairs === 3,           rm: '$2.000', reg: '$3.000' },
+    { label: '4 o más',   active: pairs >= 4, free: true, rm: 'Gratis', reg: 'Gratis' },
+  ];
+  const cell = (txt, free) => free ? `<span class="free">${txt}</span>` : txt;
+  const rows = tiers.map(t =>
+    `<tr class="${t.active ? 'active' : ''}"><td>${t.label}</td><td>${cell(t.rm, t.free)}</td><td>${cell(t.reg, t.free)}</td></tr>`
+  ).join('');
+  return `
+    <div class="ship-rates">
+      <div class="ship-rates-title">🦩 Costo de envío</div>
+      <table>
+        <thead><tr><th>Pares</th><th>Santiago</th><th>Regiones</th></tr></thead>
+        <tbody>${rows}</tbody>
+      </table>
+    </div>`;
+}
 
 // ── Cupones ───────────────────────────────────────────
 async function applyCoupon() {
@@ -271,83 +289,96 @@ function injectCart() {
 
   const style = document.createElement('style');
   style.textContent = `
-    .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:900;opacity:0;pointer-events:none;transition:opacity .3s;}
+    .cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:900;opacity:0;pointer-events:none;transition:opacity .3s;}
     .cart-overlay.open{opacity:1;pointer-events:all;}
-    .cart-drawer{position:fixed;top:0;right:0;bottom:0;width:min(440px,100vw);background:#fff;z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.12);}
+    .cart-drawer{position:fixed;top:0;right:0;bottom:0;width:min(460px,100vw);background:#fff;z-index:901;display:flex;flex-direction:column;transform:translateX(100%);transition:transform .35s cubic-bezier(.4,0,.2,1);box-shadow:-8px 0 40px rgba(0,0,0,.18);}
     .cart-drawer.open{transform:translateX(0);}
-    .cart-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:1px solid #eee;flex-shrink:0;}
-    .cart-header-title{font-family:'Causten',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:3px;text-transform:uppercase;color:#1B2D4A;}
-    .cart-close{background:none;border:none;cursor:pointer;font-size:18px;color:#999;padding:4px;line-height:1;}
+    .cart-header{display:flex;align-items:center;justify-content:space-between;padding:20px 24px;border-bottom:2px solid #1B2D4A;flex-shrink:0;}
+    .cart-header-title{font-family:'Causten',Arial,sans-serif;font-size:14px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;color:#1B2D4A;}
+    .cart-close{background:none;border:none;cursor:pointer;font-size:24px;color:#555;padding:4px;line-height:1;}
     .cart-close:hover{color:#1B2D4A;}
 
     /* STEP ITEMS */
     #cart-step-items{flex:1;display:flex;flex-direction:column;overflow:hidden;}
     .cart-items{flex:1;overflow-y:auto;padding:16px 24px;}
-    .cart-empty{text-align:center;padding:60px 0;color:#999;}
-    .cart-empty p{font-family:'Causten',Arial,sans-serif;font-size:13px;margin-bottom:16px;}
-    .cart-empty a{font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#F0907C;}
-    .cart-item{display:grid;grid-template-columns:64px 1fr auto;gap:12px;align-items:start;padding:16px 0;border-bottom:1px solid #f0f0f0;}
+    .cart-empty{text-align:center;padding:60px 0;color:#555;}
+    .cart-empty p{font-family:'Causten',Arial,sans-serif;font-size:16px;margin-bottom:16px;}
+    .cart-empty a{font-family:'Causten',Arial,sans-serif;font-size:13px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#F0907C;}
+    .cart-item{display:grid;grid-template-columns:72px 1fr auto;gap:14px;align-items:start;padding:18px 0;border-bottom:1px solid #e8e8e8;}
     .cart-item:last-child{border-bottom:none;}
-    .cart-item-img{width:64px;height:64px;border-radius:2px;overflow:hidden;background:#f5f5f5;}
+    .cart-item-img{width:72px;height:72px;border-radius:3px;overflow:hidden;background:#f0f0f0;}
     .cart-item-img img{width:100%;height:100%;object-fit:cover;}
-    .cart-item-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:24px;}
-    .cart-item-name{font-family:'Causten',Arial,sans-serif;font-size:12px;font-weight:700;color:#1B2D4A;margin-bottom:2px;}
-    .cart-item-type{font-family:'Causten',Arial,sans-serif;font-size:10px;color:#999;margin-bottom:6px;letter-spacing:1px;text-transform:uppercase;}
-    .cart-item-price{font-family:'Causten',Arial,sans-serif;font-size:13px;font-weight:800;color:#F0907C;}
-    .cart-item-controls{display:flex;align-items:center;gap:6px;margin-top:4px;}
-    .qty-btn{width:26px;height:26px;border:1px solid #ddd;background:#fff;border-radius:2px;cursor:pointer;font-size:14px;line-height:1;display:flex;align-items:center;justify-content:center;color:#1B2D4A;transition:all .15s;}
-    .qty-btn:hover{background:#1B2D4A;color:#fff;border-color:#1B2D4A;}
-    .qty-val{font-family:'Causten',Arial,sans-serif;font-size:12px;font-weight:700;min-width:20px;text-align:center;color:#1B2D4A;}
-    .remove-btn{background:none;border:none;cursor:pointer;color:#ccc;font-size:12px;padding:4px;margin-left:4px;transition:color .15s;}
+    .cart-item-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:28px;}
+    .cart-item-name{font-family:'Causten',Arial,sans-serif;font-size:16px;font-weight:800;color:#1B2D4A;margin-bottom:3px;line-height:1.25;}
+    .cart-item-type{font-family:'Causten',Arial,sans-serif;font-size:12px;color:#666;margin-bottom:8px;letter-spacing:1px;text-transform:uppercase;}
+    .cart-item-price{font-family:'Causten',Arial,sans-serif;font-size:17px;font-weight:800;color:#E07A63;}
+    .cart-item-controls{display:flex;align-items:center;gap:8px;margin-top:4px;}
+    .qty-btn{width:34px;height:34px;border:1.5px solid #1B2D4A;background:#fff;border-radius:3px;cursor:pointer;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;color:#1B2D4A;font-weight:700;transition:all .15s;}
+    .qty-btn:hover{background:#1B2D4A;color:#fff;}
+    .qty-val{font-family:'Causten',Arial,sans-serif;font-size:16px;font-weight:800;min-width:26px;text-align:center;color:#1B2D4A;}
+    .remove-btn{background:none;border:none;cursor:pointer;color:#888;font-size:16px;padding:4px;margin-left:4px;transition:color .15s;}
     .remove-btn:hover{color:#e74c3c;}
-    .cart-footer{padding:20px 24px;border-top:1px solid #eee;background:#fff;flex-shrink:0;}
+    .cart-footer{padding:20px 24px;border-top:2px solid #1B2D4A;background:#fff;flex-shrink:0;}
     .coupon-row{display:flex;gap:8px;margin-bottom:6px;}
-    .coupon-row input{flex:1;padding:10px 12px;border:1px solid #ddd;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:12px;color:#1B2D4A;outline:none;text-transform:uppercase;transition:border-color .15s;box-sizing:border-box;}
+    .coupon-row input{flex:1;padding:12px 14px;border:1.5px solid #bbb;border-radius:3px;font-family:'Causten',Arial,sans-serif;font-size:14px;color:#1B2D4A;outline:none;text-transform:uppercase;transition:border-color .15s;box-sizing:border-box;}
     .coupon-row input:focus{border-color:#1B2D4A;}
-    .coupon-row input::placeholder{text-transform:none;color:#bbb;}
-    .coupon-row button{padding:10px 18px;background:#fff;color:#1B2D4A;border:1px solid #1B2D4A;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:9px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
+    .coupon-row input::placeholder{text-transform:none;color:#888;}
+    .coupon-row button{padding:12px 20px;background:#fff;color:#1B2D4A;border:1.5px solid #1B2D4A;border-radius:3px;font-family:'Causten',Arial,sans-serif;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;cursor:pointer;transition:all .15s;}
     .coupon-row button:hover{background:#1B2D4A;color:#fff;}
-    .coupon-msg{font-family:'Causten',Arial,sans-serif;font-size:10px;margin:0 0 10px;min-height:13px;color:#999;letter-spacing:.5px;}
-    .coupon-msg.ok{color:#1F9D55;font-weight:700;}
-    .coupon-msg.error{color:#e74c3c;}
-    .cart-sub-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:11px;color:#666;margin-bottom:6px;}
-    .cart-sub-line.discount{color:#1F9D55;font-weight:700;}
-    .coupon-remove{background:none;border:none;color:#ccc;cursor:pointer;font-size:10px;margin-left:8px;padding:2px;vertical-align:middle;}
+    .coupon-msg{font-family:'Causten',Arial,sans-serif;font-size:13px;margin:0 0 10px;min-height:16px;color:#555;letter-spacing:.3px;}
+    .coupon-msg.ok{color:#178045;font-weight:700;}
+    .coupon-msg.error{color:#d83a2a;font-weight:700;}
+    .cart-sub-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:14px;color:#444;margin-bottom:7px;}
+    .cart-sub-line.discount{color:#178045;font-weight:700;}
+    .coupon-remove{background:none;border:none;color:#888;cursor:pointer;font-size:13px;margin-left:8px;padding:2px;vertical-align:middle;}
     .coupon-remove:hover{color:#e74c3c;}
-    .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
-    .cart-total-label{font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;}
-    .cart-total-price{font-family:'Causten',Arial,sans-serif;font-size:20px;font-weight:900;color:#1B2D4A;}
-    #cart-checkout-btn{display:block;width:100%;padding:16px;background:#F0907C;color:#fff;border:none;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
-    #cart-checkout-btn:hover{background:#d97a68;}
-    .cart-security{text-align:center;margin-top:10px;font-family:'Causten',Arial,sans-serif;font-size:9px;color:#bbb;letter-spacing:1px;}
-    .cart-ship-hint{font-family:'Causten',Arial,sans-serif;font-size:10px;color:#999;text-align:center;margin:-8px 0 14px;letter-spacing:.3px;}
+    .cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+    .cart-total-label{font-family:'Causten',Arial,sans-serif;font-size:14px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#1B2D4A;}
+    .cart-total-price{font-family:'Causten',Arial,sans-serif;font-size:28px;font-weight:900;color:#1B2D4A;}
+    #cart-checkout-btn{display:block;width:100%;padding:18px;background:#E07A63;color:#fff;border:none;border-radius:3px;font-family:'Causten',Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+    #cart-checkout-btn:hover{background:#c8624c;}
+    .cart-security{text-align:center;margin-top:12px;font-family:'Causten',Arial,sans-serif;font-size:12px;color:#666;letter-spacing:.5px;}
+
+    /* Tabla de tarifas de envío */
+    .ship-rates{margin:6px 0 16px;border:1.5px solid #1B2D4A;border-radius:5px;overflow:hidden;}
+    .ship-rates-title{background:#1B2D4A;color:#fff;font-family:'Causten',Arial,sans-serif;font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;padding:9px 12px;text-align:center;}
+    .ship-rates table{width:100%;border-collapse:collapse;font-family:'Causten',Arial,sans-serif;}
+    .ship-rates th,.ship-rates td{padding:9px 8px;font-size:13px;text-align:center;}
+    .ship-rates thead th{background:#eef1f6;color:#1B2D4A;font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;}
+    .ship-rates thead th:first-child{text-align:left;}
+    .ship-rates tbody td:first-child{text-align:left;color:#1B2D4A;font-weight:800;}
+    .ship-rates tbody tr{border-top:1px solid #e5e5e5;color:#333;font-weight:600;}
+    .ship-rates tbody tr.active{background:#FDEEEA;}
+    .ship-rates tbody tr.active td{color:#1B2D4A;font-weight:900;}
+    .ship-rates .free{color:#178045;font-weight:900;}
 
     /* STEP SHIPPING */
     #cart-step-shipping{flex:1;display:none;flex-direction:column;overflow:hidden;}
     .shipping-form-wrap{flex:1;overflow-y:auto;padding:20px 24px;}
-    .shipping-back{background:none;border:none;cursor:pointer;font-family:'Causten',Arial,sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;display:flex;align-items:center;gap:6px;margin-bottom:20px;padding:0;}
+    .shipping-back{background:none;border:none;cursor:pointer;font-family:'Causten',Arial,sans-serif;font-size:12px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:#555;display:flex;align-items:center;gap:6px;margin-bottom:20px;padding:0;}
     .shipping-back:hover{color:#1B2D4A;}
-    .form-row{margin-bottom:14px;}
-    .form-row label{display:block;font-family:'Causten',Arial,sans-serif;font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#999;margin-bottom:6px;}
-    .form-row input,.form-row select,.form-row textarea{width:100%;padding:11px 14px;border:1px solid #ddd;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:13px;color:#1B2D4A;background:#fff;outline:none;transition:border-color .15s;box-sizing:border-box;}
+    .form-row{margin-bottom:16px;}
+    .form-row label{display:block;font-family:'Causten',Arial,sans-serif;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:#1B2D4A;margin-bottom:6px;}
+    .form-row input,.form-row select,.form-row textarea{width:100%;padding:13px 14px;border:1.5px solid #bbb;border-radius:3px;font-family:'Causten',Arial,sans-serif;font-size:15px;color:#1B2D4A;background:#fff;outline:none;transition:border-color .15s;box-sizing:border-box;}
     .form-row input:focus,.form-row select:focus,.form-row textarea:focus{border-color:#1B2D4A;}
+    .form-row input::placeholder,.form-row textarea::placeholder{color:#999;}
     .form-row textarea{resize:none;height:72px;}
     .form-row-half{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-    .shipping-footer{padding:20px 24px;border-top:1px solid #eee;background:#fff;flex-shrink:0;}
+    .shipping-footer{padding:20px 24px;border-top:2px solid #1B2D4A;background:#fff;flex-shrink:0;}
     .ship-summary{margin-bottom:16px;}
-    .ship-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:12px;color:#666;margin-bottom:8px;}
-    .ship-line.ship-total-line{font-size:15px;font-weight:900;color:#1B2D4A;border-top:1px solid #eee;padding-top:10px;margin-top:2px;}
-    #shipping-submit-btn{display:block;width:100%;padding:16px;background:#F0907C;color:#fff;border:none;border-radius:2px;font-family:'Causten',Arial,sans-serif;font-size:10px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
-    #shipping-submit-btn:hover{background:#d97a68;}
-    #shipping-submit-btn:disabled{background:#ccc;cursor:not-allowed;}
-    .shipping-security{text-align:center;margin-top:10px;font-family:'Causten',Arial,sans-serif;font-size:9px;color:#bbb;letter-spacing:1px;}
+    .ship-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:15px;color:#333;margin-bottom:9px;font-weight:600;}
+    .ship-line.ship-total-line{font-size:20px;font-weight:900;color:#1B2D4A;border-top:1.5px solid #1B2D4A;padding-top:12px;margin-top:4px;}
+    #shipping-submit-btn{display:block;width:100%;padding:18px;background:#E07A63;color:#fff;border:none;border-radius:3px;font-family:'Causten',Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:background .2s;}
+    #shipping-submit-btn:hover{background:#c8624c;}
+    #shipping-submit-btn:disabled{background:#bbb;cursor:not-allowed;}
+    .shipping-security{text-align:center;margin-top:12px;font-family:'Causten',Arial,sans-serif;font-size:12px;color:#666;letter-spacing:.5px;}
 
     /* Nav badge */
-    .cart-icon-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.7);padding:8px;transition:color .2s;position:relative;}
+    .cart-icon-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:rgba(255,255,255,.85);padding:8px;transition:color .2s;position:relative;}
     .cart-icon-btn:hover{color:#fff;}
-    .cart-icon-btn svg{width:20px;height:20px;}
-    .cart-badge{position:absolute;top:-2px;right:-2px;background:#F0907C;color:#fff;border-radius:50%;width:16px;height:16px;font-family:'Causten',Arial,sans-serif;font-size:9px;font-weight:900;display:none;align-items:center;justify-content:center;}
-    .btn-add-cart{display:block;width:100%;text-align:center;font-family:'Causten',Arial,sans-serif;font-size:11px;font-weight:800;letter-spacing:2.5px;text-transform:uppercase;background:#1B2D4A;color:white;padding:17px 32px;border-radius:2px;transition:background .2s;margin-bottom:10px;border:none;cursor:pointer;}
+    .cart-icon-btn svg{width:22px;height:22px;}
+    .cart-badge{position:absolute;top:-2px;right:-2px;background:#E07A63;color:#fff;border-radius:50%;width:19px;height:19px;font-family:'Causten',Arial,sans-serif;font-size:11px;font-weight:900;display:none;align-items:center;justify-content:center;}
+    .btn-add-cart{display:block;width:100%;text-align:center;font-family:'Causten',Arial,sans-serif;font-size:13px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:#1B2D4A;color:white;padding:18px 32px;border-radius:3px;transition:background .2s;margin-bottom:10px;border:none;cursor:pointer;}
     .btn-add-cart:hover{background:#0e1e32;}
   `;
   document.head.appendChild(style);
@@ -386,7 +417,7 @@ function injectCart() {
             <span class="cart-total-label">Total</span>
             <span class="cart-total-price" id="cart-total-amount">$0</span>
           </div>
-          <p id="cart-ship-hint" class="cart-ship-hint"></p>
+          <div id="cart-ship-rates"></div>
           <button id="cart-checkout-btn" onclick="goToShipping()">Ingresar datos de envío →</button>
           <p class="cart-security">🔒 Pago seguro con Mercado Pago</p>
         </div>
