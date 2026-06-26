@@ -484,13 +484,13 @@ function injectCart() {
                 <label class="delivery-opt">
                   <input type="radio" name="entrega" value="retiro" onchange="onDeliveryChange()">
                   <span class="delivery-opt-title">Retiro donde los Tíos Flamingo</span>
-                  <span class="delivery-opt-sub">Gratis 🦩</span>
+                  <span class="delivery-opt-sub">Gratis · Las Condes 🦩</span>
                 </label>
               </div>
             </div>
 
             <div id="pickup-info" style="display:none;">
-              <div class="pickup-box">🦩 Después de tu compra te contactamos por WhatsApp para coordinar el lugar y horario de retiro. ¡Sin costo de envío!</div>
+              <div class="pickup-box">🦩 Retiras en <strong>Las Condes, Santiago</strong>. Después de tu compra te contactamos por WhatsApp para coordinar el horario. ¡Sin costo de envío!</div>
             </div>
 
             <div id="envio-fields">
