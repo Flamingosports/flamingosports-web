@@ -683,6 +683,38 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
   </div>
 </section>
 
+<!-- ALIADOS / PARTNERS Y COMPLEMENTOS -->
+<style>
+  .aliados-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:20px;max-width:760px;}
+  .aliado-card{display:block;background:var(--white);border:1.5px solid #e5ddd3;border-radius:6px;padding:28px 26px;transition:border-color .2s,transform .2s,box-shadow .2s;}
+  .aliado-card:hover{border-color:var(--coral);transform:translateY(-3px);box-shadow:0 10px 30px rgba(0,0,0,.07);}
+  .aliado-cat{font-family:var(--r);font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--coral);margin-bottom:8px;}
+  .aliado-name{font-family:var(--r);font-size:24px;font-weight:900;color:var(--navy);margin-bottom:10px;}
+  .aliado-desc{font-family:var(--i);font-size:14px;color:var(--muted);line-height:1.6;margin-bottom:18px;}
+  .aliado-link{font-family:var(--r);font-size:12px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--navy);}
+  .aliado-card:hover .aliado-link{color:var(--coral);}
+  @media(max-width:640px){.aliados-grid{grid-template-columns:1fr;}}
+</style>
+<section id="aliados" class="section-pad" style="background:var(--cream);">
+  <div class="eyebrow">Equípate completo</div>
+  <h2 class="section-h">Partners y complementos.</h2>
+  <p class="section-p">El pádel se juega completo. Estas son marcas chilenas amigas que recomendamos para armar tu setup: paletas, zapatillas y, por supuesto, tus calcetines Flamingo.</p>
+  <div class="aliados-grid">
+    <a href="https://qurb.cl/" target="_blank" rel="noopener" class="aliado-card">
+      <div class="aliado-cat">Zapatillas de pádel</div>
+      <div class="aliado-name">QURB</div>
+      <p class="aliado-desc">La primera marca chilena de zapatillas de pádel. Agarre y soporte pensados para la cancha.</p>
+      <span class="aliado-link">Visitar sitio →</span>
+    </a>
+    <a href="https://www.yavusports.com/" target="_blank" rel="noopener" class="aliado-card">
+      <div class="aliado-cat">Paletas de pádel</div>
+      <div class="aliado-name">Yavu Sports</div>
+      <p class="aliado-desc">Paletas de pádel de diseño premium, fabricadas en carbono para control y durabilidad.</p>
+      <span class="aliado-link">Visitar sitio →</span>
+    </a>
+  </div>
+</section>
+
 <!-- FOOTER -->
 <footer>
   <div class="footer-top">
@@ -698,6 +730,7 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
         <a href="productos.html" class="footer-link">Todos los productos</a>
         <a href="#performance" class="footer-link">Performance</a>
         <a href="#eventos" class="footer-link">Eventos</a>
+        <a href="#aliados" class="footer-link">Aliados</a>
         <a href="nosotros.html" class="footer-link">Nosotros</a>
       </div>
     </div>
