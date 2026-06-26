@@ -157,6 +157,7 @@ function shipRatesHTML(pairs) {
         <thead><tr><th>Pares</th><th>Santiago</th><th>Regiones</th></tr></thead>
         <tbody>${rows}</tbody>
       </table>
+      <div class="ship-rates-note">O retira <strong>gratis</strong> donde los Tíos Flamingo 🦩</div>
     </div>`;
 }
 
@@ -213,23 +214,42 @@ function goToShipping() {
     content_ids: Cart.get().map(i => i.id), content_type: 'product',
   });
   showCartStep('shipping');
-  document.getElementById('cart-header-title').textContent = 'Datos de envío';
+  document.getElementById('cart-header-title').textContent = 'Datos de entrega';
+  onDeliveryChange();
+}
+
+// Cambia entre envío a domicilio y retiro: muestra/oculta los campos de
+// dirección, ajusta los "required" y recalcula el resumen.
+function onDeliveryChange() {
+  const form = document.getElementById('shipping-form');
+  if (!form) return;
+  const isPickup = form.entrega.value === 'retiro';
+  const envioFields = document.getElementById('envio-fields');
+  const pickupInfo  = document.getElementById('pickup-info');
+  if (envioFields) envioFields.style.display = isPickup ? 'none' : 'block';
+  if (pickupInfo)  pickupInfo.style.display  = isPickup ? 'block' : 'none';
+  // Los campos de dirección no pueden ser obligatorios si se va a retirar
+  ['region', 'ciudad', 'direccion'].forEach(n => { if (form[n]) form[n].required = !isPickup; });
+  document.querySelectorAll('.delivery-opt').forEach(el => el.classList.remove('selected'));
+  form.querySelector(`input[name="entrega"][value="${form.entrega.value}"]`)?.closest('.delivery-opt')?.classList.add('selected');
   updateShippingSummary();
 }
 
 // Recalcula el resumen (subtotal + envío + total) en el paso de despacho.
-// Se dispara al entrar al paso y cada vez que cambia la región seleccionada.
+// Se dispara al entrar al paso, al cambiar región y al cambiar tipo de entrega.
 function updateShippingSummary() {
   const form = document.getElementById('shipping-form');
   if (!form) return;
+  const isPickup = form.entrega && form.entrega.value === 'retiro';
   const region   = form.region.value || '';
   const subtotal = Cart.totalToPay();
-  const ship     = Cart.shippingCost(region); // null = región no elegida
+  const ship     = isPickup ? 0 : Cart.shippingCost(region); // null = región no elegida
   const subEl  = document.getElementById('ship-subtotal');
   const costEl = document.getElementById('ship-cost');
   const totEl  = document.getElementById('ship-total');
   if (subEl)  subEl.textContent = '$' + subtotal.toLocaleString('es-CL');
-  if (costEl) costEl.textContent = ship === null ? 'Según región'
+  if (costEl) costEl.textContent = isPickup     ? 'Gratis (retiro)'
+                                 : ship === null ? 'Según región'
                                  : ship === 0    ? 'Gratis'
                                  : '$' + ship.toLocaleString('es-CL');
   if (totEl)  totEl.textContent = '$' + (subtotal + (ship || 0)).toLocaleString('es-CL');
@@ -245,14 +265,16 @@ async function submitShipping(e) {
   const btn = document.getElementById('shipping-submit-btn');
   const form = document.getElementById('shipping-form');
 
+  const isPickup = form.entrega.value === 'retiro';
   const shipping = {
+    entrega:   form.entrega.value, // 'envio' | 'retiro'
     nombre:    form.nombre.value.trim(),
     email:     form.email.value.trim(),
     telefono:  form.telefono.value.trim(),
-    region:    form.region.value,
-    ciudad:    form.ciudad.value.trim(),
-    direccion: form.direccion.value.trim(),
-    depto:     form.depto.value.trim(),
+    region:    isPickup ? '' : form.region.value,
+    ciudad:    isPickup ? '' : form.ciudad.value.trim(),
+    direccion: isPickup ? '' : form.direccion.value.trim(),
+    depto:     isPickup ? '' : form.depto.value.trim(),
     notas:     form.notas.value.trim(),
   };
 
@@ -271,7 +293,7 @@ async function submitShipping(e) {
     // vuelve con su carrito intacto. Se vacía en gracias.html con pago aprobado.
     sessionStorage.setItem('flamingo_order', JSON.stringify({
       pref: data.preference_id,
-      total: Cart.totalToPay() + (Cart.shippingCost(shipping.region) || 0),
+      total: Cart.totalToPay() + (isPickup ? 0 : (Cart.shippingCost(shipping.region) || 0)),
       items: Cart.get(),
     }));
     window.location.href = data.init_point;
@@ -351,6 +373,8 @@ function injectCart() {
     .ship-rates tbody tr.active{background:#FDEEEA;}
     .ship-rates tbody tr.active td{color:#1B2D4A;font-weight:900;}
     .ship-rates .free{color:#178045;font-weight:900;}
+    .ship-rates-note{font-family:'Causten',Arial,sans-serif;font-size:12px;color:#444;text-align:center;padding:9px 8px;border-top:1px solid #e5e5e5;background:#fafafa;}
+    .ship-rates-note strong{color:#178045;}
 
     /* STEP SHIPPING */
     #cart-step-shipping{flex:1;display:none;flex-direction:column;overflow:hidden;}
@@ -364,6 +388,14 @@ function injectCart() {
     .form-row input::placeholder,.form-row textarea::placeholder{color:#999;}
     .form-row textarea{resize:none;height:72px;}
     .form-row-half{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    .delivery-toggle{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+    .delivery-opt{display:flex;flex-direction:column;gap:3px;border:1.5px solid #bbb;border-radius:4px;padding:13px 14px;cursor:pointer;transition:all .15s;position:relative;}
+    .delivery-opt:hover{border-color:#1B2D4A;}
+    .delivery-opt.selected{border-color:#E07A63;background:#FDEEEA;}
+    .delivery-opt input{position:absolute;opacity:0;width:0;height:0;}
+    .delivery-opt-title{font-family:'Causten',Arial,sans-serif;font-size:13px;font-weight:800;color:#1B2D4A;line-height:1.2;}
+    .delivery-opt-sub{font-family:'Causten',Arial,sans-serif;font-size:11px;color:#666;font-weight:600;}
+    .pickup-box{font-family:'Causten',Arial,sans-serif;font-size:13px;line-height:1.55;color:#1B2D4A;background:#FDEEEA;border-left:4px solid #E07A63;border-radius:3px;padding:13px 16px;margin-bottom:16px;}
     .shipping-footer{padding:20px 24px;border-top:2px solid #1B2D4A;background:#fff;flex-shrink:0;}
     .ship-summary{margin-bottom:16px;}
     .ship-line{display:flex;justify-content:space-between;align-items:center;font-family:'Causten',Arial,sans-serif;font-size:15px;color:#333;margin-bottom:9px;font-weight:600;}
@@ -440,6 +472,28 @@ function injectCart() {
               <label>Teléfono *</label>
               <input type="tel" name="telefono" required placeholder="+56 9 XXXX XXXX">
             </div>
+
+            <div class="form-row">
+              <label>¿Cómo quieres recibir tu pedido? *</label>
+              <div class="delivery-toggle">
+                <label class="delivery-opt selected">
+                  <input type="radio" name="entrega" value="envio" checked onchange="onDeliveryChange()">
+                  <span class="delivery-opt-title">Envío a domicilio</span>
+                  <span class="delivery-opt-sub">Despacho por Bluexpress</span>
+                </label>
+                <label class="delivery-opt">
+                  <input type="radio" name="entrega" value="retiro" onchange="onDeliveryChange()">
+                  <span class="delivery-opt-title">Retiro donde los Tíos Flamingo</span>
+                  <span class="delivery-opt-sub">Gratis 🦩</span>
+                </label>
+              </div>
+            </div>
+
+            <div id="pickup-info" style="display:none;">
+              <div class="pickup-box">🦩 Después de tu compra te contactamos por WhatsApp para coordinar el lugar y horario de retiro. ¡Sin costo de envío!</div>
+            </div>
+
+            <div id="envio-fields">
             <div class="form-row">
               <label>Región *</label>
               <select name="region" required onchange="updateShippingSummary()">
@@ -476,8 +530,9 @@ function injectCart() {
               <label>Dirección *</label>
               <input type="text" name="direccion" required placeholder="Calle y número">
             </div>
+            </div><!-- /envio-fields -->
             <div class="form-row">
-              <label>Notas para el despacho</label>
+              <label>Notas (opcional)</label>
               <textarea name="notas" placeholder="Instrucciones adicionales (opcional)"></textarea>
             </div>
           </form>
@@ -489,7 +544,7 @@ function injectCart() {
             <div class="ship-line ship-total-line"><span>Total</span><span id="ship-total">$0</span></div>
           </div>
           <button id="shipping-submit-btn" onclick="document.getElementById('shipping-form').requestSubmit()">Confirmar y pagar →</button>
-          <p class="shipping-security">🔒 Pago seguro con Mercado Pago · Despacho por Bluexpress</p>
+          <p class="shipping-security">🔒 Pago seguro con Mercado Pago</p>
         </div>
       </div>
 
@@ -501,6 +556,7 @@ function injectCart() {
 window.Cart          = Cart;
 window.goToShipping  = goToShipping;
 window.updateShippingSummary = updateShippingSummary;
+window.onDeliveryChange = onDeliveryChange;
 window.backToCart    = backToCart;
 window.submitShipping = submitShipping;
 window.applyCoupon   = applyCoupon;
