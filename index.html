@@ -100,11 +100,17 @@ nav{
 
 /* ── HERO ── */
 #hero{position:relative;height:100svh;min-height:600px;display:flex;align-items:flex-end;overflow:hidden;}
-.hero-bg{position:absolute;inset:0;background:url('images/hero.jpg') center/cover no-repeat;}
-.hero-bg::after{
+.hero-slides{position:absolute;inset:0;}
+.hero-slide{position:absolute;inset:0;background-position:center;background-size:cover;background-repeat:no-repeat;opacity:0;transition:opacity 1.2s ease;}
+.hero-slide.active{opacity:1;}
+.hero-slide::after{
   content:'';position:absolute;inset:0;
   background:linear-gradient(to top,rgba(27,45,74,.92) 0%,rgba(27,45,74,.40) 55%,rgba(0,0,0,.1) 100%);
 }
+.hero-dots{position:absolute;bottom:26px;right:6vw;z-index:3;display:flex;gap:10px;}
+.hero-dot{width:11px;height:11px;border-radius:50%;border:none;background:rgba(255,255,255,.45);cursor:pointer;padding:0;transition:background .2s,transform .2s;}
+.hero-dot:hover{background:rgba(255,255,255,.75);}
+.hero-dot.active{background:#fff;transform:scale(1.25);}
 .hero-content{position:relative;z-index:2;padding:0 6vw 9vh;max-width:680px;}
 .hero-eyebrow{
   font-family:var(--r);font-size:10px;font-weight:700;
@@ -420,7 +426,11 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
 
 <!-- HERO -->
 <section id="hero">
-  <div class="hero-bg"></div>
+  <div class="hero-slides">
+    <div class="hero-slide active" style="background-image:url('images/hero.jpg')"></div>
+    <div class="hero-slide" style="background-image:url('images/uso-celeste.jpg');background-position:center 35%"></div>
+    <div class="hero-slide" style="background-image:url('images/coleccion-canasto.jpg')"></div>
+  </div>
   <div class="color-strip"></div>
   <div class="hero-content">
     <div class="hero-eyebrow">Flamingo Sports · Chile · Tenis y Pádel</div>
@@ -431,7 +441,28 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
       <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="btn btn-outline">@flamingosport.cl</a>
     </div>
   </div>
+  <div class="hero-dots">
+    <button class="hero-dot active" aria-label="Imagen 1" onclick="heroGoTo(0)"></button>
+    <button class="hero-dot" aria-label="Imagen 2" onclick="heroGoTo(1)"></button>
+    <button class="hero-dot" aria-label="Imagen 3" onclick="heroGoTo(2)"></button>
+  </div>
 </section>
+<script>
+(function(){
+  var slides = document.querySelectorAll('#hero .hero-slide');
+  var dots   = document.querySelectorAll('#hero .hero-dot');
+  if (slides.length < 2) return;
+  var i = 0, timer;
+  function go(n){
+    i = (n + slides.length) % slides.length;
+    slides.forEach(function(s,k){ s.classList.toggle('active', k===i); });
+    dots.forEach(function(d,k){ d.classList.toggle('active', k===i); });
+  }
+  function start(){ timer = setInterval(function(){ go(i+1); }, 5000); }
+  window.heroGoTo = function(n){ go(n); clearInterval(timer); start(); };
+  start();
+})();
+</script>
 
 
 <!-- COLECCIÓN — FOTOS LIMPIAS DE PRODUCTO -->
