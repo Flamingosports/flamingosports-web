@@ -231,7 +231,10 @@ nav{
 /* ── PERFORMANCE ── */
 #performance{background:var(--navy);}
 .perf-layout{display:grid;grid-template-columns:1fr 1fr;gap:72px;align-items:center;}
-.perf-photo{border-radius:4px;overflow:hidden;aspect-ratio:4/5;}
+.perf-photo{position:relative;border-radius:4px;overflow:hidden;aspect-ratio:4/5;}
+.perf-pin{position:absolute;width:14px;height:14px;border-radius:50%;background:var(--coral);border:2px solid #fff;animation:pinPulse 2.4s infinite;}
+@keyframes pinPulse{0%{box-shadow:0 0 0 0 rgba(240,144,124,.6);}70%{box-shadow:0 0 0 13px rgba(240,144,124,0);}100%{box-shadow:0 0 0 0 rgba(240,144,124,0);}}
+@media(max-width:760px){.perf-pin{display:none;}}
 .feat-list{display:flex;flex-direction:column;gap:30px;}
 .feat{display:flex;gap:18px;align-items:flex-start;}
 .feat-n{
@@ -407,7 +410,7 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
     <a href="#performance" class="nav-link">Performance</a>
     <a href="#eventos" class="nav-link">Eventos</a>
     <a href="nosotros.html" class="nav-link">Nosotros</a>
-    <a href="productos.html" class="nav-cta">Comprar</a>
+    <a href="productos.html" class="nav-cta">Ver Modelos</a>
     <button class="cart-icon-btn" onclick="Cart.open()" aria-label="Carrito">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
       <span class="cart-badge">0</span>
@@ -422,9 +425,9 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
   <div class="hero-content">
     <div class="hero-eyebrow">Flamingo Sports · Chile · Tenis y Pádel</div>
     <h1 class="hero-title">Técnico<br>por dentro.<br><em>Estiloso</em><br>por fuera.</h1>
-    <p class="hero-sub">Calcetines de alto rendimiento construidos para el jugador que cuida su juego — y su imagen.</p>
+    <p class="hero-sub">Encuentra tus calcetines de tenis y pádel: alto rendimiento para el jugador que cuida su juego — y su imagen.</p>
     <div class="hero-actions">
-      <a href="#coleccion" class="btn btn-coral">Ver colección</a>
+      <a href="productos.html" class="btn btn-coral">Ver modelos →</a>
       <a href="https://www.instagram.com/flamingosport.cl" target="_blank" class="btn btn-outline">@flamingosport.cl</a>
     </div>
   </div>
@@ -434,7 +437,7 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
 <!-- COLECCIÓN — FOTOS LIMPIAS DE PRODUCTO -->
 <section id="coleccion" class="section-pad" style="background:var(--cream);">
   <div class="eyebrow">La colección</div>
-  <h2 class="section-h">Encuentra tus calcetines de tenis y pádel.</h2>
+  <h2 class="section-h">Todos los modelos para tenis y pádel.</h2>
   <p class="section-p"><strong>Seis</strong> modelos, <strong>tres</strong> tamaños, <strong>trece</strong> colores.<br><strong>Un</strong> solo estándar técnico.<br>Zonas de amortiguación, compresión en el arco, y ventilación activa.</p>
 
   <div class="products-grid" style="margin-top:40px;">
@@ -545,7 +548,13 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
 <!-- PERFORMANCE -->
 <section id="performance" class="section-pad">
   <div class="perf-layout">
-    <div class="perf-photo"><img src="images/performance.jpg" alt="Calcetines Flamingo Sports — construcción técnica para tenis y pádel" loading="lazy"></div>
+    <div class="perf-photo">
+      <img src="images/detalle-zonas.jpg" alt="Detalle de las zonas técnicas del calcetín Flamingo Sports — amortiguación, compresión y ventilación para tenis y pádel" loading="lazy">
+      <span class="perf-pin" style="top:20%;left:46%"></span>
+      <span class="perf-pin" style="top:43%;left:58%"></span>
+      <span class="perf-pin" style="top:60%;left:40%"></span>
+      <span class="perf-pin" style="top:80%;left:52%"></span>
+    </div>
     <div>
       <div class="eyebrow">Por qué importa</div>
       <h2 class="section-h w">Construido para rendir.</h2>
