@@ -68,12 +68,14 @@ nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:cen
 .products-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px;}
 .product-card{display:block;background:white;border-radius:4px;overflow:hidden;cursor:pointer;transition:transform .25s,box-shadow .25s;color:inherit;text-decoration:none;}
 .product-card:hover{transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.1);}
-.product-img{aspect-ratio:1/1;overflow:hidden;position:relative;background:#f0f0f0;}
+.product-img{display:block;aspect-ratio:1/1;overflow:hidden;position:relative;background:#f0f0f0;}
 .product-img img{width:100%;height:100%;transition:opacity .4s ease;}
 .product-img .img-main{object-fit:contain;padding:12px;}
 .product-img .img-hover{position:absolute;inset:0;object-fit:cover;padding:0;opacity:0;}
-.product-card:hover .product-img .img-main{opacity:0;}
-.product-card:hover .product-img .img-hover{opacity:1;}
+.swatches{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px;}
+.swatch{width:22px;height:22px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px #d4d4d4;cursor:pointer;padding:0;transition:transform .15s,box-shadow .15s;}
+.swatch:hover{transform:scale(1.15);}
+.swatch.active{box-shadow:0 0 0 2px var(--navy);}
 .img-hover.rotate-cw{transform:rotate(90deg);}
 .card-add-btn{position:absolute;bottom:0;left:0;right:0;z-index:3;background:rgba(27,45,74,.92);color:white;font-family:var(--r);font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;border:none;padding:11px;cursor:pointer;opacity:0;transform:translateY(6px);transition:opacity .22s ease,transform .22s ease;}
 .product-card:hover .card-add-btn{opacity:1;transform:translateY(0);}
@@ -261,26 +263,68 @@ const HOVER_MAP = {
 };
 const ROTATE_HOVER = new Set(['tamarugal-navy', 'tamarugal-blanco']);
 
+// Color de cada swatch (aprox. al color real del calcetín)
+const SWATCH = {
+  'Negro':'#1a1a1a','Amarillo Flúor':'#d8e000','Pink':'#ef6fa0','Lila':'#c9a9e0',
+  'Morado':'#7B4FE0','Celeste':'#5cc8e8','Navy':'#1B2D4A','Blanco':'#ffffff',
+  'Turquesa':'#00B5BD','Gris':'#9aa0a6','Blanco y Celeste':'#cfe7f3',
+};
+const imgOf = p => 'images/' + (COL_MAP[p.id] || p.imagen);
+
+// 1 card por modelo, con selector de color. Agrupa por nombre conservando el orden.
 function renderGrid(filtro) {
   const grid = document.getElementById('grid');
   const items = filtro === 'todos'
     ? PRODUCTOS
     : PRODUCTOS.filter(p => p.tipo.toLowerCase().includes(filtro));
-
-  grid.innerHTML = items.map(p => `
-    <a class="product-card" href="producto.html?id=${p.id}">
-      <div class="product-img">
-        <img class="img-main" src="images/${COL_MAP[p.id] || p.imagen}" alt="${p.alt}" loading="lazy">
-        <img class="img-hover${ROTATE_HOVER.has(p.id) ? ' rotate-cw' : ''}" src="images/${HOVER_MAP[p.id] || (p.id + '-2.jpg')}" alt="${p.alt}" loading="lazy">
-        <button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();Cart.add({id:'${p.id}',name:'${p.nombre} ${p.color}',type:'${p.tipo}',image:'images/${COL_MAP[p.id] || p.imagen}'})">+ Agregar al carrito</button>
-      </div>
+  const modelos = [];
+  const idx = {};
+  for (const p of items) {
+    if (idx[p.nombre] === undefined) { idx[p.nombre] = modelos.length; modelos.push([]); }
+    modelos[idx[p.nombre]].push(p);
+  }
+  grid.innerHTML = modelos.map(vs => {
+    const f = vs[0];
+    const swatches = vs.map((p, i) =>
+      `<button class="swatch${i === 0 ? ' active' : ''}" style="background:${SWATCH[p.color] || '#ccc'}" title="${p.color}" aria-label="${p.color}"
+        data-id="${p.id}" data-img="${imgOf(p)}" data-alt="${p.alt}" data-color="${p.color}" data-name="${p.nombre}" data-type="${p.tipo}"
+        onmouseenter="selectVariant(this)" onfocus="selectVariant(this)" onclick="selectVariant(this)"></button>`
+    ).join('');
+    return `
+    <div class="product-card" data-id="${f.id}" data-name="${f.nombre}" data-color="${f.color}" data-type="${f.tipo}" data-img="${imgOf(f)}">
+      <a class="product-img" href="producto.html?id=${f.id}" data-role="link">
+        <img class="img-main" src="${imgOf(f)}" alt="${f.alt}" loading="lazy">
+        <button class="card-add-btn" onclick="event.preventDefault();event.stopPropagation();addCurrent(this)">+ Agregar al carrito</button>
+      </a>
       <div class="product-info">
-        <div class="product-name">${p.nombre}</div>
-        <div class="product-color">${p.color}</div>
-        <span class="product-type">${p.tipo} · Tenis y Pádel</span>
+        <div class="product-name">${f.nombre}</div>
+        <div class="product-color" data-role="color">${f.color}</div>
+        <span class="product-type">${f.tipo} · Tenis y Pádel</span>
+        <div class="swatches">${swatches}</div>
+        <div class="product-price">$9.990</div>
       </div>
-    </a>
-  `).join('');
+    </div>`;
+  }).join('');
+}
+
+// Cambia la variante mostrada (imagen, color, link y datos para el carrito)
+function selectVariant(sw) {
+  const card = sw.closest('.product-card');
+  card.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+  sw.classList.add('active');
+  const d = sw.dataset;
+  Object.assign(card.dataset, { id: d.id, name: d.name, color: d.color, type: d.type, img: d.img });
+  const im = card.querySelector('.img-main');
+  im.src = d.img; im.alt = d.alt;
+  card.querySelector('[data-role=link]').href = 'producto.html?id=' + d.id;
+  const c = card.querySelector('[data-role=color]');
+  if (c) c.textContent = d.color;
+}
+
+// Agrega al carrito la variante actualmente seleccionada de esa card
+function addCurrent(btn) {
+  const d = btn.closest('.product-card').dataset;
+  Cart.add({ id: d.id, name: d.name + ' ' + d.color, type: d.type, image: d.img });
 }
 
 function filtrar(btn, tipo) {
