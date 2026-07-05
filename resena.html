@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<!-- Meta Pixel -->
+<script>!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','2081018419120819');fbq('track','PageView');</script><noscript><img height="1" width="1" style="display:none" src="https://www.facebook.com/tr?id=2081018419120819&ev=PageView&noscript=1"/></noscript><!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-Y731WPTC3C"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-Y731WPTC3C');</script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Deja tu reseña — Flamingo Sports Chile</title>
+<meta name="description" content="Cuéntanos cómo te fue con tus calcetines Flamingo Sports. Tu reseña ayuda a otros jugadores de tenis y pádel a decidirse.">
+<link rel="icon" href="images/favicon-circle.png" type="image/png">
+<link rel="canonical" href="https://www.flamingosports.cl/resena.html">
+<style>
+@font-face{font-family:'Causten';src:url('fonts/Causten-Black.ttf') format('truetype');font-weight:900;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Bold.ttf') format('truetype');font-weight:700;font-style:normal;font-display:swap;}
+@font-face{font-family:'Causten';src:url('fonts/Causten-Regular.ttf') format('truetype');font-weight:400;font-style:normal;font-display:swap;}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+:root{--navy:#1B2D4A;--navy2:#0e1e32;--coral:#F0907C;--cream:#F7F4F0;--white:#fff;--text:#1a1a1a;--muted:#666;--r:'Causten',sans-serif;}
+body{font-family:var(--r);color:var(--text);background:var(--white);}
+a{text-decoration:none;color:inherit;}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:14px 5vw;background:rgba(27,45,74,0.95);backdrop-filter:blur(10px);}
+.nav-logo{display:flex;align-items:center;gap:10px;}
+.nav-logo img{height:28px;width:28px;object-fit:contain;filter:invert(1) brightness(2);}
+.nav-logo-text{font-family:var(--r);font-size:14px;font-weight:800;letter-spacing:5px;color:white;text-transform:uppercase;}
+.nav-cta{font-family:var(--r);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:var(--coral);color:white;padding:9px 20px;border-radius:2px;}
+.page-header{background:var(--navy);padding:120px 6vw 60px;text-align:center;}
+.page-eyebrow{font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--coral);margin-bottom:10px;}
+.page-title{font-family:var(--r);font-size:clamp(32px,5vw,56px);font-weight:900;color:white;letter-spacing:-1px;margin-bottom:12px;}
+.page-sub{font-family:var(--r);font-size:15px;font-weight:300;color:rgba(255,255,255,.55);max-width:500px;margin:0 auto;line-height:1.7;}
+.content{max-width:620px;margin:0 auto;padding:64px 6vw 80px;}
+.field{margin-bottom:22px;}
+.field label{display:block;font-family:var(--r);font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);margin-bottom:8px;}
+.field input,.field select,.field textarea{width:100%;font-family:var(--r);font-size:15px;padding:13px 14px;border:1.5px solid #ddd;border-radius:3px;background:var(--white);color:var(--text);}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--coral);}
+.field textarea{min-height:130px;resize:vertical;line-height:1.6;}
+.field .hint{font-size:12px;color:#999;margin-top:6px;}
+.stars{display:flex;gap:6px;}
+.stars button{font-size:34px;line-height:1;background:none;border:none;cursor:pointer;color:#ddd;transition:color .12s,transform .12s;padding:2px;}
+.stars button.on{color:var(--coral);}
+.stars button:hover{transform:scale(1.15);}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:560px){.row2{grid-template-columns:1fr;}}
+.btn-coral{display:inline-block;font-family:var(--r);font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;background:var(--coral);color:white;padding:15px 34px;border-radius:2px;border:none;cursor:pointer;}
+.btn-coral:disabled{opacity:.5;cursor:default;}
+.msg{display:none;border-radius:4px;padding:18px 22px;font-size:14.5px;line-height:1.7;margin-bottom:24px;}
+.msg.err{display:block;background:#fdeeee;border-left:3px solid #d9534f;color:#8a3230;}
+.msg.ok{display:block;background:#eefaf1;border-left:3px solid #1F9D55;color:#1a5c38;}
+.verified-note{background:var(--cream);border-left:3px solid var(--coral);padding:16px 20px;border-radius:0 4px 4px 0;margin-bottom:34px;}
+.verified-note p{font-size:13.5px;color:#555;line-height:1.7;}
+.google-cta{display:none;text-align:center;margin-top:26px;}
+.google-cta a{display:inline-block;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;border:1.5px solid var(--navy);color:var(--navy);padding:13px 26px;border-radius:2px;}
+footer{background:var(--navy2);padding:28px 6vw;text-align:center;}
+.footer-copy{font-family:var(--r);font-size:11px;font-weight:400;color:rgba(255,255,255,.2);}
+.wa-float{position:fixed;bottom:24px;right:24px;z-index:999;width:52px;height:52px;background:#25D366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.45);}
+.wa-float svg{width:28px;height:28px;fill:white;}
+.hp{position:absolute;left:-9999px;opacity:0;height:0;overflow:hidden;}
+</style>
+</head>
+<body>
+
+<nav>
+  <a href="index.html" class="nav-logo">
+    <img src="images/logo-negro.png" alt="Flamingo Sports">
+    <span class="nav-logo-text">Flamingo</span>
+  </a>
+  <a href="productos.html" class="nav-cta">Ver Modelos</a>
+</nav>
+
+<div class="page-header">
+  <div class="page-eyebrow">Tu opinión importa</div>
+  <h1 class="page-title">Deja tu reseña</h1>
+  <p class="page-sub">¿Ya jugaste con tus Flamingo? Cuéntale a otros jugadores cómo te fue. Son 2 minutos.</p>
+</div>
+
+<div class="content">
+
+  <div class="verified-note">
+    <p>🦩 <strong>Reseñas reales, siempre.</strong> Si usas el mismo email de tu compra, tu reseña sale con el sello <strong>✔ Compra verificada</strong> y se publica de inmediato. Las demás las revisamos antes de publicar.</p>
+  </div>
+
+  <div class="msg" id="msg"></div>
+
+  <form id="reviewForm" novalidate>
+    <div class="field">
+      <label>Tu puntuación *</label>
+      <div class="stars" id="stars" role="radiogroup" aria-label="Puntuación de 1 a 5 estrellas">
+        <button type="button" data-v="1" aria-label="1 estrella">★</button>
+        <button type="button" data-v="2" aria-label="2 estrellas">★</button>
+        <button type="button" data-v="3" aria-label="3 estrellas">★</button>
+        <button type="button" data-v="4" aria-label="4 estrellas">★</button>
+        <button type="button" data-v="5" aria-label="5 estrellas">★</button>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="rName">Nombre *</label>
+        <input id="rName" type="text" maxlength="60" placeholder="Tu nombre y apellido" autocomplete="name">
+        <div class="hint">Publicamos solo tu nombre e inicial del apellido.</div>
+      </div>
+      <div class="field">
+        <label for="rEmail">Email *</label>
+        <input id="rEmail" type="email" maxlength="100" placeholder="el mismo de tu compra" autocomplete="email">
+        <div class="hint">No se publica — es solo para verificar tu compra.</div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label for="rCity">Ciudad</label>
+        <input id="rCity" type="text" maxlength="40" placeholder="Santiago, Viña, Conce…">
+      </div>
+      <div class="field">
+        <label for="rSport">¿Qué juegas?</label>
+        <select id="rSport">
+          <option value="">Elige…</option>
+          <option>Tenis</option>
+          <option>Pádel</option>
+          <option>Tenis y Pádel</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label for="rText">Tu reseña *</label>
+      <textarea id="rText" maxlength="600" placeholder="¿Cómo se sienten en cancha? ¿Qué te pareció la calidad, los colores, el envío?"></textarea>
+      <div class="hint"><span id="charCount">0</span>/600</div>
+    </div>
+    <div class="hp"><label>No llenes este campo<input type="text" id="rWeb" tabindex="-1" autocomplete="off"></label></div>
+    <button type="submit" class="btn-coral" id="submitBtn">Publicar mi reseña</button>
+  </form>
+
+  <div class="google-cta" id="googleCta">
+    <a href="" id="googleLink" target="_blank" rel="noopener">También déjala en Google →</a>
+  </div>
+
+</div>
+
+<footer>
+  <p class="footer-copy">© 2026 Flamingo Sports · Santiago, Chile</p>
+</footer>
+
+<a href="https://wa.me/56992269522?text=Hola%2C%20tengo%20una%20consulta%20sobre%20los%20calcetines%20Flamingo%20Sports" class="wa-float" target="_blank" aria-label="WhatsApp">
+  <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+
+<script>
+const WORKER_URL = 'https://mp-preference.flamingosport-cl.workers.dev';
+// Cuando exista el Perfil de Empresa de Google, pegar aquí el link
+// "escribir reseña" (https://search.google.com/local/writereview?placeid=...)
+const GOOGLE_REVIEW_URL = '';
+
+let rating = 0;
+const starBtns = [...document.querySelectorAll('#stars button')];
+function paintStars(v){ starBtns.forEach(b => b.classList.toggle('on', +b.dataset.v <= v)); }
+starBtns.forEach(b => {
+  b.addEventListener('click', () => { rating = +b.dataset.v; paintStars(rating); });
+  b.addEventListener('mouseenter', () => paintStars(+b.dataset.v));
+});
+document.getElementById('stars').addEventListener('mouseleave', () => paintStars(rating));
+
+const txt = document.getElementById('rText');
+txt.addEventListener('input', () => { document.getElementById('charCount').textContent = txt.value.length; });
+
+const msg = document.getElementById('msg');
+function showMsg(cls, html){ msg.className = 'msg ' + cls; msg.innerHTML = html; msg.scrollIntoView({behavior:'smooth', block:'center'}); }
+
+document.getElementById('reviewForm').addEventListener('submit', async e => {
+  e.preventDefault();
+  const btn = document.getElementById('submitBtn');
+  const body = {
+    name: document.getElementById('rName').value,
+    email: document.getElementById('rEmail').value,
+    city: document.getElementById('rCity').value,
+    sport: document.getElementById('rSport').value,
+    text: txt.value,
+    rating,
+    web: document.getElementById('rWeb').value,
+  };
+  if (!rating) return showMsg('err', 'Elige tu puntuación con las estrellas ⭐');
+  btn.disabled = true; btn.textContent = 'Enviando…';
+  try {
+    const res = await fetch(WORKER_URL + '/review', {
+      method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) { showMsg('err', data.error || 'No pudimos enviar tu reseña. Inténtalo de nuevo.'); btn.disabled = false; btn.textContent = 'Publicar mi reseña'; return; }
+    document.getElementById('reviewForm').style.display = 'none';
+    document.querySelector('.verified-note').style.display = 'none';
+    if (data.published) {
+      showMsg('ok', '🦩 <strong>¡Reseña publicada!</strong> Verificamos tu compra y ya está visible en flamingosports.cl. Mil gracias por la buena onda.');
+    } else {
+      showMsg('ok', '🦩 <strong>¡Gracias!</strong> Recibimos tu reseña — la revisamos y la publicamos dentro de las próximas horas.');
+    }
+    if (GOOGLE_REVIEW_URL) {
+      document.getElementById('googleLink').href = GOOGLE_REVIEW_URL;
+      document.getElementById('googleCta').style.display = 'block';
+    }
+    if (typeof gtag === 'function') gtag('event', 'submit_review', { rating: rating, verified: !!data.verified });
+  } catch {
+    showMsg('err', 'Error de conexión. Revisa tu internet e inténtalo de nuevo.');
+    btn.disabled = false; btn.textContent = 'Publicar mi reseña';
+  }
+});
+</script>
+
+</body>
+</html>

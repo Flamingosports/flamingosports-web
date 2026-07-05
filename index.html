@@ -75,6 +75,11 @@ nav{
 .resenas-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:40px;}
 .resena-card{background:var(--cream);border-radius:4px;padding:28px 24px;}
 .resena-estrellas{color:#F0907C;font-size:14px;letter-spacing:2px;margin-bottom:12px;}
+.resena-verif{display:inline-block;font-size:9.5px;font-weight:800;letter-spacing:1px;text-transform:uppercase;color:#1F9D55;background:#eefaf1;padding:3px 8px;border-radius:2px;margin-bottom:10px;}
+.resena-cta-card{background:var(--cream);border:1.5px dashed var(--coral);border-radius:4px;padding:28px 24px;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:12px;}
+.resena-cta-card p{font-size:14.5px;color:#555;line-height:1.7;}
+.resenas-footer{text-align:center;margin-top:28px;}
+.resenas-footer a{font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--navy);border-bottom:2px solid var(--coral);padding-bottom:3px;}
 .resena-texto{font-family:var(--i);font-size:14px;color:#333;line-height:1.7;margin-bottom:16px;}
 .resena-autor{display:flex;align-items:center;gap:12px;}
 .resena-avatar{width:36px;height:36px;border-radius:50%;background:var(--navy);display:flex;align-items:center;justify-content:center;font-family:var(--r);font-size:12px;font-weight:800;color:white;flex-shrink:0;}
@@ -534,28 +539,41 @@ footer{background:var(--navy2);padding:48px 6vw 28px;}
   </div>
 </section>
 
-<!-- EN CANCHA — CARRUSEL LIFESTYLE -->
+<!-- RESEÑAS REALES (se cargan del Worker: /reviews) -->
 <section id="resenas">
   <p class="section-eyebrow" style="font-family:var(--r);font-size:10px;font-weight:700;letter-spacing:4px;text-transform:uppercase;color:var(--coral);margin-bottom:12px;">Lo que dicen los que ya juegan con ellos</p>
-  <h2 class="section-h">+100 jugadores en Chile ya los usan.</h2>
-  <div class="resenas-grid">
-    <div class="resena-card">
+  <h2 class="section-h" id="resenasTitle">Reseñas de jugadores reales.</h2>
+  <div class="resenas-grid" id="resenasGrid">
+    <div class="resena-cta-card">
       <div class="resena-estrellas">★★★★★</div>
-      <p class="resena-texto">"Me llegaron en 3 días y la calidad es increíble. El color turquesa es exactamente como en las fotos. Los uso en cada entrenamiento y no se han deformado nada."</p>
-      <div class="resena-autor"><div class="resena-avatar">CL</div><div><div class="resena-nombre">Claudia L.</div><div class="resena-ciudad">Santiago · Pádel</div></div></div>
-    </div>
-    <div class="resena-card">
-      <div class="resena-estrellas">★★★★★</div>
-      <p class="resena-texto">"Llevaba años buscando calcetines técnicos que no fueran blancos. Estos no solo cumplen en rendimiento — las amortiguaciones se sienten de verdad en el juego largo."</p>
-      <div class="resena-autor"><div class="resena-avatar">MR</div><div><div class="resena-nombre">Matías R.</div><div class="resena-ciudad">Viña del Mar · Tenis</div></div></div>
-    </div>
-    <div class="resena-card">
-      <div class="resena-estrellas">★★★★★</div>
-      <p class="resena-texto">"Le regalé el par coral a mi pareja para su cumpleaños y quedó encantada. La presentación es linda y el envío llegó rapidísimo a Concepción. Los vamos a volver a pedir."</p>
-      <div class="resena-autor"><div class="resena-avatar">JP</div><div><div class="resena-nombre">Javier P.</div><div class="resena-ciudad">Concepción · Pádel</div></div></div>
+      <p>¿Ya jugaste con tus Flamingo? Sé el primero en contarle a la comunidad cómo te fue.</p>
+      <a href="resena.html" class="btn btn-coral" style="font-size:10px;padding:11px 22px;">Dejar mi reseña</a>
     </div>
   </div>
+  <div class="resenas-footer" id="resenasFooter" style="display:none;">
+    <a href="resena.html">¿Compraste? Deja tu reseña →</a>
+  </div>
 </section>
+<script>
+(async function loadReviews(){
+  try {
+    const r = await fetch('https://mp-preference.flamingosport-cl.workers.dev/reviews');
+    const data = await r.json();
+    if (!data.reviews || !data.reviews.length) return; // se queda la tarjeta CTA
+    const escR = s => String(s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+    const iniciales = n => n.split(/\s+/).map(w => w[0]).join('').slice(0,2).toUpperCase();
+    document.getElementById('resenasGrid').innerHTML = data.reviews.slice(0,6).map(rv => `
+      <div class="resena-card">
+        ${rv.verified ? '<div class="resena-verif">✔ Compra verificada</div>' : ''}
+        <div class="resena-estrellas">${'★'.repeat(rv.rating)}${'☆'.repeat(5-rv.rating)}</div>
+        <p class="resena-texto">"${escR(rv.text)}"</p>
+        <div class="resena-autor"><div class="resena-avatar">${escR(iniciales(rv.name))}</div><div><div class="resena-nombre">${escR(rv.name)}</div><div class="resena-ciudad">${escR([rv.city, rv.sport].filter(Boolean).join(' · '))}</div></div></div>
+      </div>`).join('');
+    document.getElementById('resenasFooter').style.display = 'block';
+    if (data.count >= 3) document.getElementById('resenasTitle').textContent = `${data.avg} de 5 estrellas, dicho por jugadores reales.`;
+  } catch(e){ /* si falla, queda la tarjeta CTA */ }
+})();
+</script>
 
 <section id="carousel-section">
   <div style="text-align:center;padding:48px 6vw 0;">

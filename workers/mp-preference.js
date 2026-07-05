@@ -13,6 +13,8 @@
      GET  /ig-feed         — proxy del feed de Instagram (token nunca al browser)
      GET  /validate-coupon — valida un código de descuento (?code=X&pairs=N)
      GET  /admin           — panel de ventas (?key=ADMIN_KEY · &format=json)
+     POST /review          — recibe una reseña del sitio (verifica compra por email)
+     GET  /reviews         — reseñas aprobadas (público, para el home)
    ===================================================== */
 
 const ALLOWED_ORIGINS = [
@@ -166,6 +168,28 @@ export default {
     // ── GET /admin — panel de ventas (protegido con ADMIN_KEY) ──────
     if (request.method === 'GET' && url.pathname === '/admin') {
       return handleAdmin(url, env);
+    }
+
+    // ── GET /reviews — reseñas aprobadas (público, cacheado 5 min) ──────
+    if (request.method === 'GET' && url.pathname === '/reviews') {
+      if (!env.COUPON_KV) return json({ count: 0, avg: 0, reviews: [] });
+      const all = await kvAll(env, 'review:');
+      const pub = all.filter(r => r.status === 'approved')
+        .sort((a, b) => String(b.created).localeCompare(String(a.created)));
+      const avg = pub.length ? +(pub.reduce((s, r) => s + (r.rating || 5), 0) / pub.length).toFixed(1) : 0;
+      const reviews = pub.map(r => ({
+        name: displayName(r.name), rating: r.rating, text: r.text,
+        city: r.city || '', sport: r.sport || '', verified: !!r.verified,
+        date: String(r.created).slice(0, 10),
+      }));
+      return new Response(JSON.stringify({ count: pub.length, avg, reviews }), {
+        headers: { ...cors, 'Content-Type': 'application/json', 'Cache-Control': 'public, max-age=300' },
+      });
+    }
+
+    // ── POST /review — reseña nueva desde el sitio ──────
+    if (request.method === 'POST' && url.pathname === '/review') {
+      return handleReviewSubmit(request, env, json);
     }
 
     // ── POST /mp-webhook — notificaciones de Mercado Pago ──────
@@ -342,7 +366,13 @@ async function processPayment(paymentId, env) {
 
   if (!env.BREVO_API_KEY) return;
   const brevoHeaders = { 'api-key': env.BREVO_API_KEY, 'Content-Type': 'application/json' };
-  const REVIEW_URL = env.REVIEW_FORM_URL || 'https://www.flamingosports.cl';
+  // Formulario de reseñas propio (con sello "compra verificada" por email).
+  // Si algún día existe el perfil de Google (env.GOOGLE_REVIEW_URL), el email
+  // de review ofrece también dejarla en Google.
+  const REVIEW_URL = env.REVIEW_FORM_URL || 'https://www.flamingosports.cl/resena.html';
+  const GOOGLE_REVIEW_BTN = env.GOOGLE_REVIEW_URL
+    ? `<p style="margin:-16px 0 32px;font-size:13px;color:#666;">¿Prefieres dejarla en Google? <a href="${env.GOOGLE_REVIEW_URL}" style="color:#1B2D4A;font-weight:700;">Hazlo aquí →</a></p>`
+    : '';
   const cupMeta = meta.coupon || null;
   const discountRow = cupMeta
     ? `<tr><td style="padding:6px 0;font-size:13px;color:#1F9D55;">Descuento (${cupMeta.code})</td><td style="padding:6px 0;font-size:13px;text-align:right;color:#1F9D55;">−$${Number(cupMeta.discount).toLocaleString('es-CL')}</td></tr>`
@@ -482,7 +512,7 @@ async function processPayment(paymentId, env) {
         to: [{ email: buyerEmail, name: buyerName }],
         subject: `${primerNombre}, ¿cómo te quedaron los calcetines?`,
         scheduledAt: reviewDate,
-        htmlContent: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#1a1a1a;"><p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:16px;">FLAMINGO SPORTS</p><h2 style="font-size:24px;font-weight:900;color:#1B2D4A;margin:0 0 20px;">Hola ${primerNombre}, ¿llegaron bien?</h2><p style="margin:0 0 16px;line-height:1.7;">Hace una semana despachamos tus calcetines Flamingo. Si ya los probaste en cancha, nos encantaría saber qué te parecieron.</p><p style="margin:0 0 28px;line-height:1.7;">Son 2 minutos — y tu opinión ayuda a otros jugadores a decidirse.</p><a href="${REVIEW_URL}" style="display:inline-block;background:#F0907C;color:white;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:2px;text-decoration:none;margin-bottom:32px;">Dejar mi opinión →</a><p style="margin:0 0 4px;">Gracias de verdad,</p><p style="margin:0 0 32px;font-weight:700;">Nico, Kimu y Pollo<br><span style="font-size:12px;color:#999;font-weight:400;letter-spacing:1px;text-transform:uppercase;">Los Tíos Flamingo</span></p><p style="font-size:11px;color:#bbb;border-top:1px solid #eee;padding-top:16px;">Flamingo Sports · Santiago, Chile · <a href="https://www.flamingosports.cl" style="color:#bbb;">flamingosports.cl</a><br>Si no quieres recibir más correos de nuestra parte, responde este mensaje.</p></div>`,
+        htmlContent: `<div style="font-family:Arial,sans-serif;max-width:560px;margin:0 auto;font-size:15px;color:#1a1a1a;"><p style="font-size:11px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#999;margin-bottom:16px;">FLAMINGO SPORTS</p><h2 style="font-size:24px;font-weight:900;color:#1B2D4A;margin:0 0 20px;">Hola ${primerNombre}, ¿llegaron bien?</h2><p style="margin:0 0 16px;line-height:1.7;">Hace una semana despachamos tus calcetines Flamingo. Si ya los probaste en cancha, nos encantaría saber qué te parecieron.</p><p style="margin:0 0 28px;line-height:1.7;">Son 2 minutos — y tu opinión ayuda a otros jugadores a decidirse.</p><a href="${REVIEW_URL}" style="display:inline-block;background:#F0907C;color:white;font-family:Arial,sans-serif;font-size:11px;font-weight:700;letter-spacing:2px;text-transform:uppercase;padding:14px 28px;border-radius:2px;text-decoration:none;margin-bottom:32px;">Dejar mi opinión →</a>${GOOGLE_REVIEW_BTN}<p style="margin:0 0 4px;">Gracias de verdad,</p><p style="margin:0 0 32px;font-weight:700;">Nico, Kimu y Pollo<br><span style="font-size:12px;color:#999;font-weight:400;letter-spacing:1px;text-transform:uppercase;">Los Tíos Flamingo</span></p><p style="font-size:11px;color:#bbb;border-top:1px solid #eee;padding-top:16px;">Flamingo Sports · Santiago, Chile · <a href="https://www.flamingosports.cl" style="color:#bbb;">flamingosports.cl</a><br>Si no quieres recibir más correos de nuestra parte, responde este mensaje.</p></div>`,
       }),
     }));
   }
@@ -519,15 +549,79 @@ async function kvAll(env, prefix) {
 const clp = n => '$' + Number(n || 0).toLocaleString('es-CL');
 const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
+// "Ricardo Herrera Cuevas" → "Ricardo H." (privacidad en la parte pública)
+function displayName(full) {
+  const p = String(full || '').trim().split(/\s+/);
+  return p.length > 1 ? `${p[0]} ${p[1][0].toUpperCase()}.` : (p[0] || 'Cliente');
+}
+
+// ── POST /review — reseña enviada desde el sitio ────────────────────────────
+// Si el email coincide con una compra registrada (sale:*) → "compra
+// verificada" y se publica de inmediato; si no, queda 'pending' hasta que se
+// apruebe desde /admin. Una reseña por email. Honeypot anti-bots: campo "web".
+async function handleReviewSubmit(request, env, json) {
+  let b; try { b = await request.json(); } catch { return json({ error: 'Datos no válidos' }, 400); }
+  if (b.web) return json({ ok: true, published: false }); // bot: fingir éxito
+  const name = String(b.name || '').trim().slice(0, 60);
+  const email = String(b.email || '').trim().toLowerCase();
+  const city = String(b.city || '').trim().slice(0, 40);
+  const sport = ['Tenis', 'Pádel', 'Tenis y Pádel'].includes(b.sport) ? b.sport : '';
+  const rating = Math.round(Number(b.rating));
+  const text = String(b.text || '').trim().slice(0, 600);
+  if (name.length < 2) return json({ error: 'Escribe tu nombre' }, 400);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return json({ error: 'Revisa tu email' }, 400);
+  if (!(rating >= 1 && rating <= 5)) return json({ error: 'Elige las estrellas' }, 400);
+  if (text.length < 15) return json({ error: 'Cuéntanos un poco más (mínimo 15 caracteres)' }, 400);
+  if (!env.COUPON_KV) return json({ error: 'Servicio no disponible' }, 500);
+  if (await env.COUPON_KV.get(`review-by:${email}`)) {
+    return json({ error: 'Ya registramos una reseña con este correo. ¡Gracias de nuevo! 🦩' }, 409);
+  }
+
+  // ¿el email compró de verdad? (sello "compra verificada" + publicación inmediata)
+  let verified = false;
+  const salesList = await env.COUPON_KV.list({ prefix: 'sale:' });
+  for (const k of salesList.keys) {
+    const raw = await env.COUPON_KV.get(k.name);
+    try { if (raw && String(JSON.parse(raw).email).toLowerCase() === email) { verified = true; break; } } catch {}
+  }
+
+  const id = `${Date.now()}-${Math.random().toString(36).slice(2, 6)}`;
+  const review = { id, name, email, city, sport, rating, text, verified, status: verified ? 'approved' : 'pending', created: new Date().toISOString() };
+  await env.COUPON_KV.put(`review:${id}`, JSON.stringify(review));
+  await env.COUPON_KV.put(`review-by:${email}`, `review:${id}`);
+  console.log(`reseña nueva de ${email}: ${rating}★ verified=${verified} → ${review.status}`);
+  return json({ ok: true, published: review.status === 'approved', verified });
+}
+
 async function handleAdmin(url, env) {
   if (!env.ADMIN_KEY || url.searchParams.get('key') !== env.ADMIN_KEY) {
     return new Response('No autorizado', { status: 401 });
   }
   if (!env.COUPON_KV) return new Response('KV no configurado', { status: 500 });
 
-  const [sales, coupons, affiliates, singles] = await Promise.all([
-    kvAll(env, 'sale:'), kvAll(env, 'coupon:'), kvAll(env, 'affiliate:'), kvAll(env, 'single:'),
+  // Moderación de reseñas: /admin?key=X&review=ID&action=approve|reject|delete
+  const act = url.searchParams.get('action');
+  const rid = url.searchParams.get('review');
+  if (act && rid) {
+    const kk = `review:${rid}`;
+    const raw = await env.COUPON_KV.get(kk);
+    if (raw) {
+      let r; try { r = JSON.parse(raw); } catch { r = null; }
+      if (r && act === 'delete') {
+        await env.COUPON_KV.delete(kk);
+        if (r.email) await env.COUPON_KV.delete(`review-by:${r.email}`);
+      } else if (r && (act === 'approve' || act === 'reject')) {
+        r.status = act === 'approve' ? 'approved' : 'rejected';
+        await env.COUPON_KV.put(kk, JSON.stringify(r));
+      }
+    }
+    return new Response(null, { status: 302, headers: { Location: `/admin?key=${encodeURIComponent(env.ADMIN_KEY)}#resenas` } });
+  }
+
+  const [sales, coupons, affiliates, singles, reviews] = await Promise.all([
+    kvAll(env, 'sale:'), kvAll(env, 'coupon:'), kvAll(env, 'affiliate:'), kvAll(env, 'single:'), kvAll(env, 'review:'),
   ]);
+  reviews.sort((a, b) => String(b.created).localeCompare(String(a.created)));
   sales.sort((a, b) => String(b.date).localeCompare(String(a.date)));
 
   const reales = sales.filter(s => !INTERNAL_EMAILS.has(String(s.email).toLowerCase()));
@@ -537,7 +631,7 @@ async function handleAdmin(url, env) {
   const canjeados = coupons.filter(c => c.used).length;
 
   if (url.searchParams.get('format') === 'json') {
-    return new Response(JSON.stringify({ resumen: { ventasReales: reales.length, ingresos, pares, aov, cuponesEmitidos: coupons.length, cuponesCanjeados: canjeados }, ventas: sales, cupones: coupons, afiliados: affiliates, codigosManuales: singles }, null, 2), {
+    return new Response(JSON.stringify({ resumen: { ventasReales: reales.length, ingresos, pares, aov, cuponesEmitidos: coupons.length, cuponesCanjeados: canjeados, resenas: reviews.length, resenasPendientes: reviews.filter(r => r.status === 'pending').length }, ventas: sales, cupones: coupons, afiliados: affiliates, codigosManuales: singles, resenas: reviews }, null, 2), {
       headers: { 'Content-Type': 'application/json' },
     });
   }
@@ -556,6 +650,23 @@ async function handleAdmin(url, env) {
     </tr>`;
   };
 
+  const adminBase = `/admin?key=${encodeURIComponent(env.ADMIN_KEY)}`;
+  const filaResena = r => {
+    const estado = r.status === 'approved' ? '🟢 publicada' : r.status === 'rejected' ? '🔴 rechazada' : '🟡 pendiente';
+    const acciones = [
+      r.status !== 'approved' ? `<a href="${adminBase}&review=${esc(r.id)}&action=approve">Publicar</a>` : '',
+      r.status !== 'rejected' ? `<a href="${adminBase}&review=${esc(r.id)}&action=reject">Ocultar</a>` : '',
+      `<a href="${adminBase}&review=${esc(r.id)}&action=delete" onclick="return confirm('¿Borrar esta reseña para siempre?')">Borrar</a>`,
+    ].filter(Boolean).join(' · ');
+    return `<tr>
+      <td>${esc(String(r.created).slice(0, 10))}</td>
+      <td><strong>${esc(r.name)}</strong>${r.verified ? ' ✔️' : ''}<br><span class="dim">${esc(r.email)}<br>${esc([r.city, r.sport].filter(Boolean).join(' · '))}</span></td>
+      <td>${'★'.repeat(r.rating || 0)}${'☆'.repeat(5 - (r.rating || 0))}</td>
+      <td style="max-width:340px;">${esc(r.text)}</td>
+      <td>${estado}</td>
+      <td>${acciones}</td>
+    </tr>`;
+  };
   const filaAfiliado = a => `<tr><td><strong>${esc(a.key.replace('affiliate:', ''))}</strong></td><td class="num">${a.uses || 0}</td><td class="num">${clp(a.totalSales)}</td><td class="num">${clp(a.totalDiscount)}</td><td class="num">${clp((a.uses || 0) * 1500)}</td></tr>`;
   const filaCupon = c => `<tr><td>${esc(c.key.replace('coupon:', ''))}</td><td>${esc(c.email)}</td><td>${esc(String(c.created).slice(0, 10))}</td><td>${c.used ? `✅ usado ${esc(String(c.usedAt).slice(0, 10))}` : 'sin usar'}</td></tr>`;
   const filaSingle = s => `<tr><td>${esc(s.key.replace('single:', ''))}</td><td>${esc(s.label || '')}</td><td>${s.used ? `✅ usado ${esc(String(s.usedAt).slice(0, 10))}` : 'vigente'}</td></tr>`;
@@ -596,6 +707,8 @@ async function handleAdmin(url, env) {
 </div>
 <h2>Ventas (${sales.length}, internas atenuadas)</h2>
 <table><tr><th>Fecha</th><th>Cliente</th><th>Productos</th><th>Cupón usado</th><th>Envío</th><th>Total</th><th>Ref</th></tr>${sales.map(filaVenta).join('') || '<tr><td colspan="7">Sin ventas registradas aún</td></tr>'}</table>
+<h2 id="resenas">Reseñas (${reviews.length} · ${reviews.filter(r => r.status === 'pending').length} pendientes · ✔️ = compra verificada)</h2>
+<table><tr><th>Fecha</th><th>Autor</th><th>Estrellas</th><th>Texto</th><th>Estado</th><th>Acciones</th></tr>${reviews.map(filaResena).join('') || '<tr><td colspan="6">Sin reseñas aún — el formulario está en flamingosports.cl/resena.html</td></tr>'}</table>
 <h2>Afiliados (pago sugerido = usos × $1.500)</h2>
 <table><tr><th>Código</th><th>Usos</th><th>Ventas generadas</th><th>Dcto. entregado</th><th>A pagar</th></tr>${affiliates.map(filaAfiliado).join('') || '<tr><td colspan="5">Sin usos de códigos de afiliado aún</td></tr>'}</table>
 <h2>Cupones personales VUELVE20</h2>
