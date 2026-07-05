@@ -29,6 +29,12 @@ const COUPONS = {
   // Vence 5 jul: cubre la tanda Fase 2 (deadline comunicado 28 jun) y la
   // tanda Fase 3 (deadline comunicado 5 jul)
   'DOSPARES': { type: 'fixed', value: 1990, minPairs: 2, validUntil: '2026-07-05', label: '2º par con $1.990 de descuento' },
+
+  // Afiliado — profe Tomás Cunietti. 15% de descuento al comprador; cada uso
+  // (pago aprobado) se cuenta en KV `affiliate:TOMAS` para pagarle a Tomás por
+  // venta. Multiuso, sin mínimo de pares. La marca `affiliate:true` activa el
+  // conteo en el webhook.
+  'TOMAS': { type: 'percent', value: 15, minPairs: 1, validUntil: '2026-12-31', label: '15% con Tomás Cunietti', affiliate: true },
 };
 
 // Códigos personales post-compra: VUELVE20-XXXX (20%, un solo uso, sin
@@ -56,6 +62,19 @@ async function validateCoupon(code, pairs, env) {
     try { data = JSON.parse(raw); } catch { return { valid: false, reason: 'Código no válido' }; }
     if (data.used) return { valid: false, reason: 'Este código ya fue usado' };
     return { valid: true, code: key, type: 'percent', value: 20, label: '20% de descuento', minPairs: 1 };
+  }
+
+  // 3 — códigos manuales de UN SOLO USO (KV `single:CODE`). Guardan sus propios
+  // type/value/minPairs. Se marcan usados en el webhook con el pago aprobado.
+  if (env?.COUPON_KV) {
+    const sraw = await env.COUPON_KV.get(`single:${key}`);
+    if (sraw) {
+      let s; try { s = JSON.parse(sraw); } catch { return { valid: false, reason: 'Código no válido' }; }
+      if (s.used) return { valid: false, reason: 'Este código ya fue usado' };
+      if (s.validUntil && new Date(`${s.validUntil}T23:59:59-04:00`) < new Date()) return { valid: false, reason: 'Este código ya venció' };
+      if ((pairs || 0) < (s.minPairs || 1)) return { valid: false, reason: `Este código requiere mínimo ${s.minPairs} pares` };
+      return { valid: true, code: key, type: s.type, value: s.value, label: s.label || 'Descuento', minPairs: s.minPairs || 1 };
+    }
   }
 
   return { valid: false, reason: 'Código no válido' };
@@ -321,6 +340,34 @@ async function processPayment(paymentId, env) {
       data.usedPaymentId = paymentId;
       await env.COUPON_KV.put(kvKey, JSON.stringify(data));
       console.log(`código ${cupMeta.code} marcado como USADO (pago ${paymentId})`);
+    }
+  }
+
+  // Afiliados (códigos de profes): contar cada uso para pagarles por venta.
+  // El dedupe de arriba evita doble conteo si MP reintenta la notificación.
+  if (cupMeta && COUPONS[String(cupMeta.code).toUpperCase()]?.affiliate && env.COUPON_KV) {
+    const code = String(cupMeta.code).toUpperCase();
+    const kvKey = `affiliate:${code}`;
+    let rec; try { rec = JSON.parse(await env.COUPON_KV.get(kvKey) || '{}'); } catch { rec = {}; }
+    rec.uses = (rec.uses || 0) + 1;
+    rec.totalSales = (rec.totalSales || 0) + Number(total || 0);
+    rec.totalDiscount = (rec.totalDiscount || 0) + Number(cupMeta.discount || 0);
+    rec.payments = (rec.payments || []).concat([{ id: paymentId, date: new Date().toISOString(), total, discount: cupMeta.discount }]);
+    await env.COUPON_KV.put(kvKey, JSON.stringify(rec));
+    console.log(`afiliado ${code}: uso #${rec.uses} (pago ${paymentId}, total $${total})`);
+  }
+
+  // Códigos manuales de un solo uso (single:CODE) → marcar usado tras pago aprobado
+  if (cupMeta && env.COUPON_KV) {
+    const sk = `single:${String(cupMeta.code).toUpperCase()}`;
+    const sraw = await env.COUPON_KV.get(sk);
+    if (sraw) {
+      let s; try { s = JSON.parse(sraw); } catch { s = null; }
+      if (s && !s.used) {
+        s.used = true; s.usedAt = new Date().toISOString(); s.usedPaymentId = paymentId;
+        await env.COUPON_KV.put(sk, JSON.stringify(s));
+        console.log(`código single ${cupMeta.code} marcado USADO (pago ${paymentId})`);
+      }
     }
   }
 
