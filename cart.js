@@ -288,7 +288,14 @@ async function submitShipping(e) {
       body: JSON.stringify({ items: Cart.get(), shipping, coupon: getCoupon()?.code || null }),
     });
     const data = await res.json();
-    if (!data.init_point) throw new Error('Sin init_point');
+    // El Worker puede rechazar con un motivo específico (ej: código de
+    // referido usado por su propio dueño) — mostrarlo tal cual
+    if (!data.init_point) {
+      alert(data.error || 'Hubo un problema. Inténtalo de nuevo.');
+      btn.disabled = false;
+      btn.textContent = 'Confirmar y pagar';
+      return;
+    }
     // El carrito NO se vacía aquí: si el pago falla o se abandona, el cliente
     // vuelve con su carrito intacto. Se vacía en gracias.html con pago aprobado.
     sessionStorage.setItem('flamingo_order', JSON.stringify({
